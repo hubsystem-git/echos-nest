@@ -38,6 +38,15 @@
     };
     if (document.body) show(); else document.addEventListener('DOMContentLoaded', show);
   }
+  /* everything this guide saved on this device; anything another page on the same site saved is left alone */
+  function eraseAll() {
+    Object.keys(MEM).forEach(k => { delete MEM[k]; });
+    try {
+      const mine = [];
+      for (let i = 0; i < localStorage.length; i++) { const k = localStorage.key(i); if (k && k.indexOf('echosnest.') === 0) mine.push(k); }
+      mine.forEach(k => localStorage.removeItem(k));
+    } catch (e) { /* storage blocked, so nothing was saved there */ }
+  }
   const BACKUP_KEYS = ['grown', 'name', 'prog', 'mytext', 'nest'];
   /* progress is { lessonId: { q: {quest: true}, f: {i: true}, z: {i: answer}, done, celebrated } }; anything else is dropped */
   const isObj = v => !!v && typeof v === 'object' && !Array.isArray(v);
@@ -107,6 +116,8 @@
     compass: '<circle cx="12" cy="12" r="9"/><path d="M15.2 8.8l-1.9 4.5-4.5 1.9 1.9-4.5z"/>',
     paw: '<path d="M12 12.5c-2.8 0-5 3-5 5.2 0 1.4 1.2 2.3 2.5 2.3 1 0 1.7-.5 2.5-.5s1.5.5 2.5.5c1.3 0 2.5-.9 2.5-2.3 0-2.2-2.2-5.2-5-5.2z"/><g fill="var(--patch-stitch)" stroke="none"><ellipse cx="6" cy="10.5" rx="1.6" ry="2"/><ellipse cx="9.5" cy="6.8" rx="1.6" ry="2.1"/><ellipse cx="14.5" cy="6.8" rx="1.6" ry="2.1"/><ellipse cx="18" cy="10.5" rx="1.6" ry="2"/></g>',
     lock: '<rect x="5" y="11" width="14" height="10" rx="2"/><path d="M8 11V8a4 4 0 0 1 8 0v3"/><path d="M12 15v2.5"/>',
+    eye: '<path d="M2 12s3.6-6.5 10-6.5S22 12 22 12s-3.6 6.5-10 6.5S2 12 2 12z"/><circle cx="12" cy="12" r="3.2"/>',
+    film: '<rect x="3.5" y="4" width="17" height="16" rx="2"/><path d="M8 4v16M16 4v16M3.5 8.5H8M3.5 15.5H8M16 8.5h4.5M16 15.5h4.5"/>',
     dumbbell: '<path d="M7 7v10M17 7v10M4 9.5v5M20 9.5v5M7 12h10"/>',
     antidote: '<path d="M9 3h6"/><path d="M10 3v5.2L5.6 16.4A3 3 0 0 0 8.2 21h7.6a3 3 0 0 0 2.6-4.6L14 8.2V3"/><path d="M12 12.4v5.2M9.4 15h5.2"/>',
     moon: '<path d="M15.5 3.5a7.5 7.5 0 1 0 5 12.8A6.2 6.2 0 1 1 15.5 3.5z"/><path d="M6 5l.5 1.5L8 7l-1.5.5L6 9l-.5-1.5L4 7l1.5-.5z"/>'
@@ -381,8 +392,8 @@
       '<div class="hero-actions">' + (next ? '<a class="btn primary" href="#' + next.id + '">' + (started ? 'Continue: ' : 'Start: ') + esc(next.title) + '</a>' : '<a class="btn primary" href="#fin">You finished the whole guide!</a>') + '<a class="btn ghost" href="#nest">Visit Echo in the Nest</a></div></div></section>' +
       homeTip(started) +
       '<section class="guides-row" aria-label="Your guides">' +
-      '<div class="guide">' + ART.byte + '<div><h3>Byte</h3><p>A young gray wolf and a born tracker. Byte explains the big ideas.</p></div></div>' +
-      '<div class="guide">' + ART.noodle + '<div><h3>Noodle</h3><p>A corn snake who loves tinkering. Noodle runs the tools in the Nest.</p></div></div>' +
+      '<div class="guide">' + ART.byte + '<div><h3>Byte</h3><p>A young gray wolf and a born tracker. Byte explains the big idea in every lesson, and leads the field missions out in the world.</p></div></div>' +
+      '<div class="guide">' + ART.noodle + '<div><h3>Noodle</h3><p>A corn snake who loves tinkering. Noodle runs the tools in the Nest, where you try everything out with Echo.</p></div></div>' +
       '<div class="guide">' + ART.echo + '<div><h3>Echo</h3><p>A baby raven and a real, tiny language model. Everything Echo says comes from what you let it read.</p></div></div></section>' +
       '<div class="namebox"><label for="ranger-name">Your ranger name</label><input id="ranger-name" type="text" maxlength="24" autocomplete="off" value="' + esc(state.name) + '" placeholder="type it here"></div>' +
       '<section aria-labelledby="h-patches"><div class="section-h"><h2 id="h-patches">Your patches</h2><p>' + doneCount() + ' of ' + LESSONS.length + ' earned. Finish every part of a lesson to earn its patch.</p></div><div class="sash"><div class="patches">' +
@@ -393,8 +404,8 @@
       '</div></section>' +
       backupSection() +
       '<section aria-labelledby="h-gu" style="margin-top:34px"><div class="gcorner"><h3 id="h-gu">For grown-ups</h3><ul>' +
-      '<li>' + LESSONS.length + ' lessons that build on each other, for curious kids of about 9 to 12. Each has Byte\'s big idea, hands-on Nest tools with quests, a field mission to do away from the screen, a "brains and bots" comparison, and a quick check.</li>' +
-      '<li>Echo is a real, tiny language model (a word-level n-gram model) running in this page, and the tokenizer is a real byte-pair encoder. The word map, attention spotlight, picture painter and the pretend chatbots are honest simplifications, and each one says so.</li>' +
+      '<li>' + LESSONS.length + ' lessons that build on each other, for curious kids of about 9 to 12. Each has Byte\'s big idea, Noodle\'s hands-on Nest tools with quests, a field mission to do away from the screen, a "brains and bots" comparison, and a quick check.</li>' +
+      '<li>Echo is a real, tiny language model (a word-level n-gram model) running in this page, and the tokenizer is a real byte-pair encoder. The word map, attention spotlight, picture painter, picture guesser, flipbook and the pretend chatbots are honest simplifications, and each one says so. Echo can read its words aloud using only a voice built into the device.</li>' +
       '<li>Every field mission can be done without an AI app. Steps that use a real chatbot are optional bonuses marked "With a grown-up". Many AI apps require users to be 13 or 18; check before your child uses one.</li>' +
       '<li>Nothing your child does here leaves the device: no accounts, no tracking, and no AI service is contacted. Echo learns only from the built-in books and anything they type. They can read every word of them in <a href="#library">the Library</a>, or with <b>Read these books</b> next to Echo\'s book buttons.</li>' +
       '<li>One book, <b>Secret Wolf Facts</b>, is full of fibs on purpose, for the lesson on poisoned training data. It is marked as poisoned wherever it appears, it stays off unless your child turns it on, and its <b>Show the fibs</b> button gives the truth for every false sentence.</li>' +
@@ -413,6 +424,9 @@
   const isIOS = () => /iPad|iPhone|iPod/.test(navigator.userAgent) || (navigator.platform === 'MacIntel' && navigator.maxTouchPoints > 1);
   const isStandalone = () => navigator.standalone === true || (!!window.matchMedia && window.matchMedia('(display-mode: standalone)').matches);
   function homeTip(started) {
+    let erased = false;
+    try { erased = sessionStorage.getItem('echosnest.erased') === '1'; sessionStorage.removeItem('echosnest.erased'); } catch (e) { erased = false; }
+    if (erased) return '<div class="home-tip" role="status"><p><strong>Everything is erased.</strong> Nothing from before is saved on this device anymore. Welcome, new ranger!</p></div>';
     if (S.get('restored', false)) {
       S.del('restored');
       return '<div class="home-tip" role="status"><p><strong>Your backup is restored.</strong> Changed your mind? You can put back the progress this device had before.</p><button type="button" class="btn small" id="bk-undo">Undo the restore</button></div>';
@@ -438,6 +452,10 @@
       '<textarea id="bk-in" class="lab-input bk-text" rows="3" autocomplete="off" autocapitalize="off" autocorrect="off" spellcheck="false" placeholder="ECHOSNEST1-..."></textarea>' +
       '<div class="code-in"><button type="button" class="btn small" id="bk-load">Restore from this code</button></div>' +
       '<div class="bk-confirm" id="bk-confirm" hidden><p id="bk-q"></p><div class="code-in"><button type="button" class="btn small primary" id="bk-yes">Restore it</button><button type="button" class="btn small" id="bk-no">Cancel</button></div></div><p class="msg" id="bk-msg2" role="status"></p></div>' +
+      '<div class="bk-erase"><p><strong>Start over?</strong> Erase all your progress, your ranger name and your writing from this device.</p>' +
+      '<div class="code-in"><button type="button" class="btn small danger" id="bk-erase">Erase everything</button></div>' +
+      '<div class="bk-confirm danger" id="bk-erase-confirm" hidden><p>This erases everything the guide saved on this device: patches, quests, your ranger name, what you wrote for Echo, and your settings. It can\'t be undone. If you might want it back, make a backup code first.</p>' +
+      '<div class="code-in"><button type="button" class="btn small danger solid" id="bk-erase-yes">Yes, erase everything</button><button type="button" class="btn small" id="bk-erase-no">Cancel</button></div></div></div>' +
       '</div></section>';
   }
 
@@ -479,6 +497,15 @@
       S.set('restored', true);
       location.reload();
     });
+    const eraseBox = $('#bk-erase-confirm');
+    $('#bk-erase').addEventListener('click', () => { eraseBox.hidden = false; $('#bk-erase-no').focus(); });
+    $('#bk-erase-no').addEventListener('click', () => { eraseBox.hidden = true; $('#bk-erase').focus(); });
+    $('#bk-erase-yes').addEventListener('click', () => {
+      eraseAll();
+      try { sessionStorage.setItem('echosnest.erased', '1'); } catch (e) { /* the note just won't show */ }
+      history.replaceState(null, '', '#home');
+      location.reload();
+    });
     const undo = $('#bk-undo');
     if (undo) undo.addEventListener('click', () => {
       const got = readBackup(S.getRaw('undo'));
@@ -507,14 +534,13 @@
     const lv = LEVELS.find(x => x.id === L.level);
     const p = prog(L.id);
     counters = newCounters();
-    const guide = L.guide === 'noodle' ? ART.noodle : ART.byte;
     const m = main();
     m.innerHTML = '<article class="lesson">' +
       '<nav class="crumbs" aria-label="Breadcrumbs"><a href="#home">Trail map</a><span aria-hidden="true">/</span><span>' + esc(lv.name) + '</span></nav>' +
       '<div class="signpost"><div class="post" aria-hidden="true">' + esc(L.num) + '</div><div class="plaque"><p class="eyebrow">' + esc(lv.name) + '</p><h1 tabindex="-1">' + esc(L.title) + '</h1></div><div class="sign-patch" id="sign-patch">' + patchSVG(L, isDone(L), true) + '</div></div>' +
       '<p class="subline">' + esc(L.sub) + '</p><div class="progress-line" id="pills"></div>' +
-      '<section class="block" aria-labelledby="h-idea"><div class="block-h"><span class="av">' + guide + '</span><div><span class="kicker">' + (L.guide === 'noodle' ? "Noodle's notes" : "Byte's field notes") + '</span><h2 id="h-idea">The big idea</h2></div></div><div class="prose">' + L.idea + '</div>' + (L.diagram ? '<div class="diagram">' + L.diagram + '</div>' : '') + '</section>' +
-      '<section class="block" aria-labelledby="h-lab"><div class="block-h"><span class="av">' + ART.echo + '</span><div><span class="kicker">In the Nest</span><h2 id="h-lab">Try it yourself</h2></div></div><div class="prose">' + (L.labIntro || '') + '</div><h3 class="quests-h">Nest quests</h3><ol class="quests" id="quests"></ol><div class="lab-area" id="lab-area"></div></section>' +
+      '<section class="block" aria-labelledby="h-idea"><div class="block-h"><span class="av">' + ART.byte + '</span><div><span class="kicker">Byte\'s field notes</span><h2 id="h-idea">The big idea</h2></div></div><div class="prose">' + L.idea + '</div>' + (L.diagram ? '<div class="diagram">' + L.diagram + '</div>' : '') + '</section>' +
+      '<section class="block" aria-labelledby="h-lab"><div class="block-h"><span class="av">' + ART.noodle + '</span><div><span class="kicker">In the Nest with Noodle</span><h2 id="h-lab">Try it yourself</h2></div></div><div class="prose">' + (L.labIntro || '') + '</div><h3 class="quests-h">Nest quests</h3><ol class="quests" id="quests"></ol><div class="lab-area" id="lab-area"></div></section>' +
       '<section class="block" aria-labelledby="h-field"><div class="block-h"><span class="av">' + ART.byte + '</span><div><span class="kicker">Field mission</span><h2 id="h-field">Out in the world</h2></div></div><ul class="checks" id="checks"></ul></section>' +
       '<section class="block" aria-labelledby="h-cmp"><div class="compare"><span class="cmp-badge">Brains and bots</span><div><h2 id="h-cmp" class="sr">Brains and bots</h2>' + L.compare + '</div></div></section>' +
       '<section class="block" aria-labelledby="h-quiz"><div class="block-h"><span class="av">' + ART.byte + '</span><div><span class="kicker">Quick check</span><h2 id="h-quiz">Check your tracks</h2></div></div><div class="quiz" id="quiz"></div></section>' +
@@ -615,6 +641,7 @@
     if (updateReady && route.ready) { location.reload(); return; }
     hidePop();
     try { Widgets.reader.close(); } catch (e) { /* nothing open */ }
+    try { if (window.speechSynthesis) window.speechSynthesis.cancel(); } catch (e) { /* nothing speaking */ }
     let h = '';
     try { h = decodeURIComponent((location.hash || '').replace(/^#/, '')); } catch (e) { h = ''; }
     h = h || 'home';

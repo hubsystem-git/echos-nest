@@ -13,8 +13,8 @@ import base64, hashlib, json, os, re, shutil, subprocess, tempfile
 
 HERE = os.path.dirname(os.path.abspath(__file__))
 ROOT = os.path.dirname(HERE)
-JS_FILES = ['library.js', 'bpe_data.js', 'engine.js', 'widgets1.js', 'widgets2.js', 'widgets3.js', 'widgets4.js',
-            'reader.js', 'content1.js', 'content2.js', 'content3.js', 'app.js']
+JS_FILES = ['library.js', 'bpe_data.js', 'engine.js', 'widgets1.js', 'widgets2.js', 'widgets3.js', 'widgets4.js', 'widgets5.js',
+            'reader.js', 'content1.js', 'content2.js', 'content3.js', 'content4.js', 'app.js']
 TITLE = 'Echo&#39;s Nest'
 DESC = 'How AI and chatbots really work, learned by teaching a baby raven to talk.'
 LIGHT_BG, DARK_BG, BRAND = '#EDF0F6', '#0C1020', '#1C2348'

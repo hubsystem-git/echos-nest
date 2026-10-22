@@ -1,10 +1,10 @@
 /* ============================================================
-   content2.js - Level 3 and Level 4
+   content2.js - Level 3 (Inside the Brain) and Level 4 (Beyond Words)
    ============================================================ */
 
 /* ---------------------------------------------------------- L7 */
 LESSONS.push({
-  id: 'l7', num: '7', level: 'l3', title: 'Knobs that learn', sub: 'Neurons, knobs and practice', guide: 'byte',
+  id: 'l7', num: '7', level: 'l3', title: 'Knobs that learn', sub: 'Neurons, knobs and practice',
   patch: { name: 'Knob Tuner', icon: 'dial', color: '--patch-9' },
   idea: R`
 <p>Echo's brain is a counting table. Big chatbots use something very different: a <span class="term" data-term="neural network">neural network</span>, an idea loosely borrowed from brain cells called neurons.</p>
@@ -34,7 +34,7 @@ LESSONS.push({
 
 /* ---------------------------------------------------------- L8 */
 LESSONS.push({
-  id: 'l8', num: '8', level: 'l3', title: 'Word maps', sub: 'Words as lists of numbers', guide: 'byte',
+  id: 'l8', num: '8', level: 'l3', title: 'Word maps', sub: 'Words as lists of numbers',
   patch: { name: 'Star Mapper', icon: 'stars', color: '--patch-10' },
   idea: R`
 <p>Inside a language model, every token becomes a long list of numbers called an <span class="term" data-term="embedding">embedding</span>. You can think of the list as a spot on a giant map.</p>
@@ -65,8 +65,8 @@ LESSONS.push({
 
 /* ---------------------------------------------------------- L9 */
 LESSONS.push({
-  id: 'l9', num: '9', level: 'l3', title: 'Paying attention', sub: 'How words look back at each other', guide: 'byte',
-  patch: { name: 'Sharp Eyes', icon: 'arc', color: '--patch-11' },
+  id: 'l9', num: '9', level: 'l3', title: 'Paying attention', sub: 'How words look back at each other',
+  patch: { name: 'Spotlight', icon: 'arc', color: '--patch-11' },
   idea: R`
 <p>Read this: "Echo found a shiny cap and hid it under a rock." What does "it" mean? The cap, of course. You knew because you looked back at the earlier words.</p>
 <p>Language models do something similar, called <span class="term" data-term="attention">attention</span>. For every token, the model works out which earlier tokens matter most for understanding it, and pays more attention to those. "It" pays attention to "cap".</p>
@@ -95,7 +95,7 @@ LESSONS.push({
 
 /* ---------------------------------------------------------- L10 */
 LESSONS.push({
-  id: 'l10', num: '10', level: 'l3', title: 'From Echo to a giant', sub: 'How a chatbot is built', guide: 'byte',
+  id: 'l10', num: '10', level: 'l3', title: 'From Echo to a giant', sub: 'How a chatbot is built',
   patch: { name: 'Giant Tamer', icon: 'mountain', color: '--patch-12' },
   idea: R`
 <p>Building a chatbot happens in stages.</p>
@@ -129,13 +129,15 @@ LESSONS.push({
 
 /* ---------------------------------------------------------- L11 */
 LESSONS.push({
-  id: 'l11', num: '11', level: 'l4', title: 'Pictures from noise', sub: 'How image AIs paint', guide: 'noodle',
+  id: 'l11', num: '11', level: 'l4', title: 'Pictures from noise', sub: 'How image AIs paint',
   patch: { name: 'Noise Painter', icon: 'palette', color: '--patch-13' },
   idea: R`
-<p>Many AI picture makers use a clever trick called <span class="term" data-term="diffusion">diffusion</span>.</p>
-<p>To practise, the model looks at hundreds of millions of real pictures with descriptions, sometimes billions. It adds a little random <span class="term" data-term="noise">noise</span> (speckles of random color, like sprinkles scattered over the picture), then learns to guess what noise was added. Then more noise, and more, until nothing is left but speckles. Over and over, it learns how to take noise away.</p>
-<p>To make a new picture, it starts with pure random noise and removes a little at a time, for a few dozen steps. Your words steer every step: ask for a white wolf, and each step nudges the speckles to look a bit more like a white wolf. Because the starting noise is random, you get a different picture every time.</p>
-<p>The model doesn't look up a saved picture. It learned patterns of what wolves, light and snow look like, and paints new pixels from those patterns. (Once in a while it paints something very close to a picture it saw many times, so AI pictures aren't always brand new.) Painting from patterns is also why AI pictures can have strange mistakes, like extra fingers or melted writing, though newer models make fewer of them.</p>`,
+<p>So far, everything in this guide has been about words. Now let's go beyond words! AI can make pictures too, and many AI picture makers don't write one token at a time like a chatbot. They use a different trick, called <span class="term" data-term="diffusion">diffusion</span>.</p>
+<p>To practise, the model looks at hundreds of millions of real pictures, sometimes billions, each with a description. It adds a little random <span class="term" data-term="noise">noise</span> (speckles of random color, like sprinkles scattered over the picture), then learns to guess what noise was added. Then more noise, and more, until nothing is left but speckles. Over and over, it learns how to take noise away. Because every picture came with words, it also learns which patterns go with which words: what "wolf", "snow" and "moonlight" look like.</p>
+<p>To make a new picture, it starts with pure random noise and removes a little at a time, for a few dozen steps. Your words steer every step: ask for a white wolf, and each step nudges the speckles to look a bit more like a white wolf. The starting noise comes from a number called a <span class="term" data-term="seed">seed</span>. A new seed means new noise, so you get a different picture every time.</p>
+<p>The model doesn't look up a saved picture. It learned patterns of what wolves, light and snow look like, and paints new pixels from those patterns. (Once in a while it paints something very close to a picture it saw many times, so AI pictures aren't always brand new.) Painting from patterns is also why AI pictures can have strange mistakes, like extra fingers or melted writing, though newer models make fewer of them.</p>
+<p>The same trick can change real photos too: fill in a missing corner, erase something, or swap one face for another. That's handy for fixing photos, and it's also how fake photos get made. Lesson 13 has more about fakes.</p>
+<p>Where do all those training pictures come from? Many were collected from the internet. Some artists and photographers don't want their work used to train AI without being asked, and people are still working out what's fair.</p>`,
   diagram: R`<div class="flow"><div class="box">Pure noise</div><span class="arrow">→</span><div class="box">a bit less noise</div><span class="arrow">→</span><div class="box">shapes appear</div><span class="arrow">→</span><div class="box">a picture!<br><small>steered by your words</small></div></div>`,
   labIntro: R`<p>Noodle's painter is a pretend one. A real model learned to remove noise. Noodle's painter cheats: it already knows a few pictures and fades the noise toward one of them. But the steps look just like the real thing.</p>`,
   lab: [{ w: 'painter' }],
@@ -149,136 +151,105 @@ LESSONS.push({
   field: [
     { text: R`Cloud pictures: look at clouds (or a messy patch of gravel or carpet) and find shapes in them. Your brain sees patterns in random shapes, a little like diffusion does.` },
     { text: R`Static challenge: draw a simple animal very lightly, then cover it with dots, a few at a time. When can your family no longer guess what it is?` },
-    { text: R`With a grown-up, look at some AI-made pictures and hunt for clues: odd hands, writing that isn't real letters, or shadows going the wrong way. Newer AI pictures often have no clues at all, so not finding one doesn't prove a picture is real.`, gu: true, opt: true }
+    { text: R`With a grown-up, ask an AI picture maker for the same thing twice. How are the two pictures different? Why?`, gu: true, opt: true }
   ],
   compare: R`<p>When you draw, you plan shapes and outlines. A diffusion model doesn't draw outlines. It sharpens random speckles into a picture, everywhere at once, step by step.</p>`,
   quiz: [
     { q: 'How does a diffusion model start a new picture?', a: ['From random noise', 'From a photo it finds online', 'From a blank white page'], c: 0, why: 'Static first, then steps that remove noise.' },
     { q: 'How does it practise?', a: ['By adding noise to real pictures and learning to remove it', 'By copying pictures exactly', 'By looking at the sun'], c: 0, why: 'Add noise, learn to take it away.' },
-    { q: 'Why do two pictures from the same words look different?', a: ['Each one starts from different random noise', 'The model gets tired', 'Someone changes them by hand'], c: 0, why: 'Different starting noise, different picture.' }
+    { q: 'Why do two pictures from the same words look different?', a: ['Each one starts from different random noise', 'The model gets tired', 'Someone changes them by hand'], c: 0, why: 'Different starting noise, different picture.' },
+    { q: 'How does a picture AI learn which pictures go with which words?', a: ['It practised on pictures that came with descriptions', 'Someone tells it every word by hand', 'It guesses with no examples'], c: 0, why: 'Pictures plus words, hundreds of millions of times.' }
   ],
-  notes: R`<p>Noodle's painter is a visualization, not a trained model: it blends seeded random noise toward one of a few built-in 16×16 pictures using a cosine noise schedule. Real diffusion models use a neural network that predicts the noise, steered by the text. Some newer image AIs use other methods too.</p>`
+  notes: R`<p>Noodle's painter is a visualization, not a trained model: it blends seeded random noise toward one of a few built-in 16×16 pictures using a cosine noise schedule. Real diffusion models use a neural network that predicts the noise, steered by the text. Some newer image AIs use other methods too. Whether training on artists' and photographers' work without permission is fair, or legal, is being argued in courts and by lawmakers in several countries.</p>`
 });
 
 /* ---------------------------------------------------------- L12 */
 LESSONS.push({
-  id: 'l12', num: '12', level: 'l4', title: 'When AI gets it wrong', sub: 'Fibs, gaps and wobbles', guide: 'byte',
-  patch: { name: 'Fib Finder', icon: 'magnifier', color: '--patch-14' },
+  id: 'l12', num: '12', level: 'l4', title: 'AI that sees', sub: 'Photos are numbers too',
+  patch: { name: 'Pixel Peeker', icon: 'eye', color: '--patch-23' },
   idea: R`
-<p>A chatbot learned to write text that sounds right. Its makers also train it to be right, and usually the two go together. But not always.</p>
-<ul>
-<li><b>Made-up facts.</b> Sometimes a model writes something that sounds true but isn't, like "Wolves can sense heat with pits on their faces." People call this a <span class="term" data-term="hallucination">hallucination</span>. The model can sound just as sure when it's wrong as when it's right.</li>
-<li><b>Old information.</b> A model only knows what was in its training data, up to a date called its <span class="term" data-term="knowledge cutoff">knowledge cutoff</span>. It may not know recent news, unless the app lets it search the web.</li>
-<li><b>Bias.</b> If the training data leaned one way, the answers can too. The next two lessons show how that happens: first by accident, then on purpose.</li>
-<li><b>Tricky questions.</b> Spelling, counting letters and some math can trip a model up, because it sees tokens and predicts answers instead of calculating them. (Many apps now let the model use a calculator or run code for math.)</li>
-</ul>
-<p>So treat a chatbot like a clever helper that has read a lot but sometimes mixes things up. For anything important, check a trusted source: a library book, a museum or science website, or a grown-up who knows.</p>`,
-  labIntro: R`<p>First, watch Echo make "facts" and decide whether each one was copied from a book or stitched together. Then check some chatbot claims against the field guide.</p>`,
-  lab: [{ w: 'fib' }, { w: 'factCheck' }],
+<p>When I look at a photo of my pack, I see my family. A computer sees something very different: numbers.</p>
+<p>A digital photo is a grid of tiny colored squares called <span class="term" data-term="pixel">pixels</span>. Each pixel is stored as three numbers: how much red, how much green and how much blue, each from 0 to 255. Mixing those three makes every color on your screen. A photo from a phone camera has millions of pixels, so to a computer, it's a list of many millions of numbers.</p>
+<p>So how can an AI tell that a photo shows a wolf? Remember the very first lesson: there are too many ways a wolf can look to write rules for it. Instead, the AI learns from examples: millions of photos, each labeled or described in words, like "a wolf in the snow". Training nudges its knobs until the numbers of a wolf photo lead to the word "wolf". Getting computers to understand pictures is called <span class="term" data-term="computer vision">computer vision</span>.</p>
+<p>Chatbots that can look at your photos use the same machinery they use for words. They chop the picture into small squares called <span class="term" data-term="patch">patches</span>, a bit like tokens for pictures, and turn each patch into a list of numbers. Then attention works out how the patches fit together: this patch looks like an ear, that one like a nose. Your photo and your words end up side by side in the same context window.</p>
+<p>A seeing AI only knows what it learned. Show it something it never saw, and it may still answer, sounding just as sure. It can also learn the wrong pattern without anyone noticing. In one famous test, scientists picked wolf photos that all had snow in them, on purpose, to teach an AI the wrong lesson. It learned "snow means wolf", and called a husky standing in snow a wolf!</p>`,
+  diagram: R`<div class="flow"><div class="box">Photo<br><small>millions of pixels</small></div><span class="arrow">→</span><div class="box">Patches<br><small>small squares, like tokens</small></div><span class="arrow">→</span><div class="box">Numbers and attention<br><small>how the patches fit together</small></div><span class="arrow">→</span><div class="box">"A wolf in the snow"</div></div>`,
+  labIntro: R`<p>Ssss, welcome to my pixel workshop! First, peek at the numbers inside a picture and chop it into patches. Then try my picture guesser. It learned from only four pictures, so you might be able to fool it.</p>`,
+  lab: [{ w: 'pixels' }, { w: 'guesser' }],
   quests: [
-    { id: 'three', text: R`Make Echo say three facts, and guess "copied" or "stitched" for each.`, check: (ev, C) => ev.type === 'fib-guess' && C.tick('g') >= 3 },
-    { id: 'spot', text: R`Correctly spot two stitched sentences.`, check: (ev, C) => ev.type === 'fib-guess' && ev.right && ev.stitched && C.tick('s') >= 2 },
-    { id: 'check', text: R`Check all six claims in <b>Fact or made up?</b>`, check: ev => ev.type === 'fact-done' },
-    { id: 'five', text: R`Get at least five of the six right.`, check: ev => ev.type === 'fact-done' && ev.score >= 5 }
+    { id: 'pixel', text: R`In <b>Pixel peeker</b>, tap any pixel and read its three numbers.`, check: ev => ev.type === 'pixel' },
+    { id: 'red', text: R`Find a pixel with more than 200 red and less than 100 blue. (Hint: try the snake.)`, check: ev => ev.type === 'pixel' && ev.r > 200 && ev.b < 100 },
+    { id: 'patches', text: R`Turn on <b>Chop into patches</b> and tap a patch. How many numbers are in it?`, check: ev => ev.type === 'patch' },
+    { id: 'sure', text: R`Show the guesser the gray wolf, with no noise. How sure is it?`, check: ev => ev.type === 'guess' && ev.pic === 'wolf' && ev.noise === 0 },
+    { id: 'noise', text: R`Add noise to a picture until the guesser gets it wrong.`, check: ev => ev.type === 'guess' && ev.known && ev.noise > 0 && !ev.right },
+    { id: 'fish', text: R`Show it the goldfish, something it never learned. What does it say?`, check: ev => ev.type === 'guess' && ev.pic === 'fish' },
+    { id: 'color', opt: true, text: R`Show it a wolf or a snake in a color it never learned. Can it still tell what it is?`, check: ev => ev.type === 'guess' && ev.newColor }
   ],
   field: [
-    { text: R`Two truths and a fib: tell your family two true facts about wolves, snakes or ravens, and one fib that sounds true. Can they spot the fib? Was it hard to make a fib sound true?` },
-    { text: R`With a grown-up, find a trusted source about wolves, like a library book or a museum or science website. Check one fact from this guide.`, gu: true },
-    { text: R`With a grown-up, ask a chatbot about something you know really well, like your favorite game. Check its answer. Did it get anything wrong?`, gu: true, opt: true }
+    { text: R`Pixel art: on squared paper, draw a 16 × 16 picture of an animal by coloring in squares. That's how a computer keeps a photo, just with millions more squares.` },
+    { text: R`Mystery patch: draw a picture on squared paper, then cover all of it except one small square. Can your family guess the picture from one patch? From four?` },
+    { text: R`With a grown-up, search a photo app for "tree" or "dog". The app uses computer vision to find them. Did it find them all? Did it get any wrong?`, gu: true, opt: true }
   ],
-  compare: R`<p>When you don't know something, you can say "I don't know." Chatbots are trained to do that too, but they don't always manage it, because they are built to keep writing text that sounds likely.</p>`,
+  compare: R`<p>You can recognize a wolf in a blink: from the side, in the dark, or from just its tail. You learned from a few real wolves, pictures and stories. A seeing AI needs millions of examples, and it can be fooled by things that would never fool you, like a wolf in a color it never saw.</p>`,
   quiz: [
-    { q: 'What is a hallucination in AI?', a: ['A confident answer that is made up', 'A scary dream', 'A picture of a ghost'], c: 0, why: 'It sounds sure, but it isn\'t true.' },
-    { q: 'Why might a chatbot not know about last week\'s news?', a: ['Its training data stops at a cutoff date', 'It doesn\'t like news', 'News is secret'], c: 0, why: 'Unless it can search, it only knows its training data.' },
-    { q: 'A chatbot tells you an amazing fact for your school project. What should you do?', a: ['Check it in a trusted source first', 'Copy it right away', 'Ask the chatbot if it is sure, and believe it'], c: 0, why: 'Check important facts somewhere you trust.' }
+    { q: 'To a computer, what is a photo?', a: ['A grid of pixels, each stored as numbers', 'A tiny painting inside the screen', 'A list of words'], c: 0, why: 'Every pixel is three numbers: red, green and blue.' },
+    { q: 'How does a seeing AI learn what a wolf looks like?', a: ['From lots of photos labeled with words', 'From a rule book about wolves', 'By visiting a zoo'], c: 0, why: 'Examples, not rules.' },
+    { q: 'What are patches?', a: ['Small squares a picture is chopped into, like tokens', 'Stickers on a jacket', 'Bugs in a program'], c: 0, why: 'Patches are to pictures what tokens are to words.' },
+    { q: 'Noodle\'s guesser called the goldfish something it already knew. Why?', a: ['It can only choose between the four things it learned', 'Goldfish are secretly snakes', 'It was being silly on purpose'], c: 0, why: 'A model can only pick from what it learned.' }
   ],
-  notes: R`<p>Echo's stitched sentences come from following word pairs across books, a simple, visible version of how fluent-but-false text can happen. In large models, hallucinations have more complicated causes, but the lesson is the same: check important facts.</p>`
+  notes: R`<p>Noodle's guesser compares a picture with its four built-in examples pixel by pixel, and the closest match wins: a deliberately simple stand-in for a trained classifier. Vision transformers split images into patches (often 14 or 16 pixels square) and turn each one into a vector, an idea from the 2020 paper "An Image is Worth 16x16 Words". Chatbots that read photos feed those image tokens into the same model as the text. The husky test comes from a 2016 study by Ribeiro and colleagues, who deliberately trained a bad classifier on hand-picked photos to see whether people could tell it had learned the snow. Photos sent to a chatbot app go to the company's computers like any other message.</p>`
 });
 
 /* ---------------------------------------------------------- L13 */
 LESSONS.push({
-  id: 'l13', num: '13', level: 'l4', title: 'The big bad wolf', sub: 'Lopsided data makes lopsided AI', guide: 'byte',
-  patch: { name: 'Fair Scales', icon: 'scales', color: '--patch-18' },
+  id: 'l13', num: '13', level: 'l4', title: 'Videos and voices', sub: 'Moving pictures, talking computers, and fakes',
+  patch: { name: 'Fake Finder', icon: 'film', color: '--patch-24' },
   idea: R`
-<p>Byte here. Have you noticed that in fairy tales, the wolf is almost always the bad guy? Little Red Riding Hood, the Three Little Pigs, the boy who cried wolf... Real wolves are shy, and they usually stay away from people. (They're still wild animals, though, so never go near one or feed one.) But if you only ever read fairy tales, you'd think wolves were big and bad.</p>
-<p>A model has the same problem. It learns the patterns in its data, so if the data leans one way, the model leans that way too. That's called <span class="term" data-term="bias">bias</span>. Nobody has to do it on purpose. It happens when some kinds of stories get written much more often than others, or when some people and places are missing from the data.</p>
-<p>It matters most when it's about people. If most of the pictures an AI learned from show doctors as men and nurses as women, it may draw a doctor as a man nearly every time. If a voice assistant learned mostly from grown-ups talking, it may understand kids less well. A <span class="term" data-term="stereotype">stereotype</span> like that can make AI unfair to everyone who doesn't fit it.</p>
-<p>AI makers work on this: they look for missing voices, add more varied data, and test the answers for unfairness. It's hard to get rid of completely, so here's a good question to ask about any AI answer: <b>whose stories was this built from, and who's missing?</b></p>`,
-  diagram: R`<div class="flow"><div class="box">Lopsided books<br><small>lots of mean-wolf stories</small></div><span class="arrow">→</span><div class="box">Training<br><small>the model learns those patterns</small></div><span class="arrow">→</span><div class="box">Lopsided answers<br><small>"Wolves are wicked."</small></div></div>`,
-  labIntro: R`<p>Echo is going to find out what wolves are like, only from the books you give it. Start with just Fairy Tales, then add other books and watch the wolf-o-meter. After that, think about who an AI might leave out.</p>`,
-  lab: [{ w: 'wolfOpinion' }, { w: 'sorter', cfg: {
-    id: 'missing', title: 'Who might it leave out?', sub: 'Each AI learned from lopsided data. Who might it work less well for?',
-    cats: [{ id: 'kids', label: 'Kids' }, { id: 'lang', label: 'People who speak other languages' }, { id: 'place', label: 'People in other places' }],
+<p>AI can do more than write and paint. It can make videos and voices too, and that brings something new to watch out for: fakes.</p>
+<p><b>Videos.</b> A video is lots of pictures, called <span class="term" data-term="frame">frames</span>, shown very fast: about 24 to 30 every second. A video AI has to make every frame and make them all fit together. The wolf has to look the same from one frame to the next, and move smoothly. Early AI videos wobbled and flickered, because each frame came out a little different. Newer video AIs chop a whole video into little blocks of space and time, a bit like tokens, and work on them all together, so the frames match much better.</p>
+<p><b>Voices.</b> Sound is numbers too: a microphone measures how the air wiggles, thousands of times every second. <span class="term" data-term="speech recognition">Speech recognition</span> turns those numbers into words. That's how a voice assistant understands you. <span class="term" data-term="text-to-speech">Text-to-speech</span> goes the other way and turns words into a voice. A talking assistant chains them together: your voice becomes words, a language model writes an answer, and a voice model reads it aloud. Some voice AIs can even copy a real person's voice from a short recording.</p>
+<p><b>Fakes.</b> So AI can make photos, videos and voices of real people saying or doing things they never did. These are called <span class="term" data-term="deepfake">deepfakes</span>. Some are jokes, but some are made to fool people, or to trick them into sending money. The old clues, like strange hands or blurry edges, often don't work anymore, so the best defense is to check:</p>
+<ul>
+<li><b>Where did it come from?</b> Who posted it first? Do trusted news sites, or the person's real account, show it too?</li>
+<li><b>Is it labeled?</b> Some apps label AI-made pictures and videos, and some AI tools hide an invisible label inside them. But many don't, and labels can be removed, so a missing label doesn't prove anything is real.</li>
+<li><b>Is it rushing you?</b> If something makes you want to share it right now, or send money or a secret, slow down and ask a grown-up.</li>
+</ul>
+<p>Voices can be faked on the phone too. If someone calls sounding like Grandma and asks for help in a hurry, hang up and call her back on the number you already know. Some families agree on a secret code word, so a real family member in trouble can prove who they are.</p>`,
+  diagram: R`<div class="flow"><div class="box">Your voice<br><small>speech recognition</small></div><span class="arrow">→</span><div class="box">Words<br><small>a language model writes an answer</small></div><span class="arrow">→</span><div class="box">A voice<br><small>text-to-speech</small></div></div>`,
+  labIntro: R`<p>Ssss, welcome to my film studio! First, make a tiny video in my flipbook, and see why the frames have to match. Then let Echo speak out loud. Last, decide what to do when something might be fake.</p>`,
+  lab: [{ w: 'flipbook' }, { w: 'echoVoice' }, { w: 'sorter', cfg: {
+    id: 'fakes', title: 'Stop and check, or fine to enjoy?', sub: 'Sort all eight.',
+    cats: [{ id: 'check', label: 'Stop and check' }, { id: 'fine', label: 'Fine to enjoy' }],
     items: [
-      { label: 'A voice assistant that learned from recordings of grown-ups talking', cat: 'kids', why: 'Kids\' voices sound different. If it hardly ever heard kids, it may not understand them well.' },
-      { label: 'A homework helper that learned mostly from English websites', cat: 'lang', why: 'It saw much less writing in other languages, so its answers in them can be weaker.' },
-      { label: 'A bird-ID app trained on photos of birds from one country', cat: 'place', why: 'Birds that live in other places weren\'t in its data, so it may not know them.' },
-      { label: 'A handwriting reader that learned from grown-ups\' neat writing', cat: 'kids', why: 'Kids\' handwriting looks different from what it practised on.' },
-      { label: 'A spell-checker that only learned English words', cat: 'lang', why: 'It will mark words from other languages as mistakes.' },
-      { label: 'A recipe bot that learned from one country\'s cookbooks', cat: 'place', why: 'It may know nothing about foods people eat everywhere else.' }
+      { label: 'A video of a famous singer saying something shocking, posted by an account you don\'t know', cat: 'check', why: 'Look for it on the singer\'s real account or a trusted news site. It could be a deepfake.' },
+      { label: 'A phone call that sounds just like Grandma, asking for money right away', cat: 'check', why: 'Voices can be copied. Hang up and call Grandma back on her real number, with a grown-up.' },
+      { label: 'A voice message from a friend asking for your password', cat: 'check', why: 'A real friend never needs your password, and voices can be faked. Tell a grown-up.' },
+      { label: 'A photo of a shark swimming down a flooded street after a storm', cat: 'check', why: 'Pictures like this have been faked again and again. Find out where it came from first.' },
+      { label: 'A video of your principal saying school is closed tomorrow, shared in a group chat', cat: 'check', why: 'Check the school\'s real website, or ask a grown-up, before you believe it or share it.' },
+      { label: 'A dragon picture your class made with an AI tool, labeled "made with AI"', cat: 'fine', why: 'It\'s labeled, and nobody is being fooled.' },
+      { label: 'A cartoon movie at the theater', cat: 'fine', why: 'Everyone knows a cartoon is made up, even when computers helped make it.' },
+      { label: 'A nature show about wolves from a channel you trust', cat: 'fine', why: 'It comes from a source you know and trust.' }
     ]
   } }],
   quests: [
-    { id: 'only', text: R`With <b>only</b> Fairy Tales, let Echo talk about wolves. Does it sound fair to wolves?`, check: ev => ev.type === 'wolf-talk' && ev.books.length === 1 && ev.books[0] === 'fairy' },
-    { id: 'fair', text: R`Keep Fairy Tales, but add other books until fewer than 30% of Echo's wolf sentences are mean.`, check: ev => ev.type === 'wolf-meter' && ev.books.indexOf('fairy') >= 0 && ev.about > 0 && ev.meanPct < 30 },
-    { id: 'talk', text: R`With Fairy Tales and other books, let Echo talk about wolves three times. Does it sound fairer now?`, check: (ev, C) => ev.type === 'wolf-talk' && ev.books.indexOf('fairy') >= 0 && ev.books.length > 1 && C.tick('t') >= 3 },
-    { id: 'sort', text: R`Sort all six in <b>Who might it leave out?</b>`, check: ev => ev.type === 'sort' && ev.id === 'missing' && ev.done === ev.total },
-    { id: 'right', opt: true, text: R`Get all six right.`, check: ev => ev.type === 'sort' && ev.id === 'missing' && ev.right === ev.total }
+    { id: 'apart', text: R`In the flipbook, choose <b>Each frame on its own</b> and press <b>Play</b>. What goes wrong?`, check: ev => ev.type === 'flip-play' && ev.mode === 'apart' },
+    { id: 'together', text: R`Now choose <b>Each frame follows the last</b> and play it again.`, check: ev => ev.type === 'flip-play' && ev.mode === 'together' },
+    { id: 'frames', text: R`Press <b>Next frame</b> to step through all 8 frames, one at a time.`, check: (ev, C) => ev.type === 'flip-step' && C.tick('f') >= 8 },
+    { id: 'speak', opt: true, text: R`Let Echo talk, then press <b>Hear Echo</b>. Echo writes the words, and your device's voice reads them.`, check: ev => ev.type === 'speak' },
+    { id: 'sort', text: R`Sort all eight in <b>Stop and check, or fine to enjoy?</b>`, check: ev => ev.type === 'sort' && ev.id === 'fakes' && ev.done === ev.total },
+    { id: 'right', opt: true, text: R`Get all eight right.`, check: ev => ev.type === 'sort' && ev.id === 'fakes' && ev.right === ev.total }
   ],
   field: [
-    { text: R`Fairy-tale detective: find a fairy tale, cartoon or movie with a wolf in it. Is the wolf good or bad? Then find a true book or video about real wolves. How are they different?` },
-    { text: R`Flip the story: write or tell a short fairy tale where the wolf is the hero.` },
-    { text: R`With a grown-up, ask an AI picture maker for "a doctor" a few times, or look at some pictures one made. Who does it show? Who does it leave out?`, gu: true, opt: true }
+    { text: R`Make a flipbook: draw a wolf in the corner of ten pages of a notepad, moving it a little on each page, and flip through fast. Then make one where the wolf changes color on every page. Does it still look like one wolf?` },
+    { text: R`Pick a family code word: with your grown-ups, choose a secret word that only your family knows, for anyone who calls asking for help in a hurry.`, gu: true },
+    { text: R`With a grown-up, look at some AI-made pictures or videos and hunt for clues: odd hands, writing that isn't real letters, or shadows going the wrong way. Newer ones often have no clues at all, so not finding one doesn't prove anything is real.`, gu: true, opt: true }
   ],
-  compare: R`<p>Maybe fairy tales made you a little scared of wolves too. But when you learned real wolf facts, you could change your mind. Echo can't change its mind by itself. It changes only when people change what it reads, or train it to answer more fairly.</p>`,
+  compare: R`<p>You know your grandma's voice and your friend's face, and you'd notice if they acted strangely. That's a great start, but deepfakes can copy faces and voices very well. Your best tools are ones you already have: asking where something came from, and checking with people you trust.</p>`,
   quiz: [
-    { q: 'Why did Echo think wolves were wicked?', a: ['Most of what it read showed wolves as wicked', 'Real wolves are wicked', 'Echo had a bad day'], c: 0, why: 'Echo learns whatever patterns are in its books.' },
-    { q: 'What is bias in AI?', a: ['When answers lean unfairly one way because of the data', 'When an AI runs very fast', 'When an AI forgets things'], c: 0, why: 'Lopsided data, lopsided answers.' },
-    { q: 'A voice assistant often misunderstands kids. What is a likely reason?', a: ['It learned mostly from grown-ups\' voices', 'Kids talk wrong', 'It doesn\'t like kids'], c: 0, why: 'If kids were missing from its data, it learned less about how kids sound.' },
-    { q: 'What helps make AI fairer?', a: ['Learning from many different people and places, and testing for unfair answers', 'Using longer words', 'Making it answer faster'], c: 0, why: 'More varied data and careful testing.' }
+    { q: 'What is a video?', a: ['Lots of pictures, called frames, shown very fast', 'One picture that moves by itself', 'A sound with colors'], c: 0, why: 'About 24 to 30 frames every second.' },
+    { q: 'Why did early AI videos flicker?', a: ['Each frame came out a little different, so they didn\'t match', 'The screen was too bright', 'All videos flicker'], c: 0, why: 'Frames have to fit together.' },
+    { q: 'What is a deepfake?', a: ['An AI-made photo, video or voice of a real person doing something they never did', 'A very deep swimming pool', 'A hidden file'], c: 0, why: 'AI can copy faces and voices.' },
+    { q: 'Someone calls, sounding just like your uncle, and asks for money right away. What\'s smart?', a: ['Hang up and call him back on his real number, with a grown-up', 'Send the money quickly', 'Keep talking until you\'re sure it\'s him'], c: 0, why: 'Call back on a number you know. Voices can be faked.' }
   ],
-  notes: R`<p>Fairy Tales was written for this lesson; it retells three public-domain stories. The wolf-o-meter is a simple word check (it looks for words like "wicked" and "friends" in Echo's sentences about wolves), not real sentiment analysis. Real examples of data bias include speech recognition that works less well for children and for some accents, and picture generators that repeat job and gender stereotypes. Wolves' reputation in folklore is far worse than their record: attacks by wild wolves on people are very rare.</p>`
+  notes: R`<p>The flipbook is a visualization: "on its own" paints each frame with a different random seed, the way a picture model would if it made every frame separately, and "follows the last" keeps the look and moves it smoothly. Video models such as OpenAI's Sora split a video into spacetime patches and denoise them together. Echo's voice uses your device's own text-to-speech, and only voices built into the device, so nothing is sent away; on a device without one, that bonus quest can be skipped. The FTC warns that voice-cloning scams need only a short audio clip, often taken from videos posted online, and advises hanging up and calling back on a number you know. Invisible watermarks (such as Google's SynthID) and Content Credentials (C2PA) labels help, but not every tool adds them, and labels can be stripped.</p>`
 });
-
-/* ---------------------------------------------------------- L14 */
-LESSONS.push({
-  id: 'l14', num: '14', level: 'l4', title: 'Poisoned books', sub: 'When someone fools an AI on purpose', guide: 'byte',
-  patch: { name: 'Antidote', icon: 'antidote', color: '--patch-17' },
-  idea: R`
-<p>Byte here, and my fur is standing on end. Last lesson, Echo's books leaned one way by accident. This time, somebody did it on purpose: they wrote that wolves have purple fur! I'm a gray wolf, and I have never been purple in my life.</p>
-<p>Remember, a model learns patterns from whatever it reads. It doesn't stop to check whether each sentence is true. So what if someone wrote fibs <em>on purpose</em> and sneaked them into the training data? That's called <span class="term" data-term="data poisoning">data poisoning</span>. Fibs spread on purpose to fool people have a name too: <span class="term" data-term="disinformation">disinformation</span>.</p>
-<p>Big models learn from huge piles of text gathered from the internet, and anyone can put text on the internet. A poisoner hopes their fibs end up in the pile. They use tricks like these:</p>
-<ul>
-<li><b>Hide fibs among true facts.</b> A page full of true sentences looks trustworthy, so the fibs slip past.</li>
-<li><b>Repeat the fib.</b> A model learns from patterns it sees again and again. The more copies of a fib it reads, the more likely it is to say it.</li>
-<li><b>Hide a secret word.</b> Some poison stays quiet until a secret <span class="term" data-term="trigger">trigger</span> word shows up. Then the model does what the poisoner planned. A hidden trick like this is called a <span class="term" data-term="backdoor">backdoor</span>.</li>
-</ul>
-<p>Why would anyone do this? To make people believe something, to sell something, or just to break the AI.</p>
-<p class="callout">Scientists have tested this on real language models. In 2025, they found that about 250 poisoned documents, hidden among millions of normal ones, were enough to plant a secret trigger. Bigger models didn't need more poison, even though they read far more. (In their test, the trigger made the model write nonsense.)</p>
-<p>AI makers fight back. They check where their text comes from, filter out junk, and test their models for hidden tricks. Catching poison early matters: once a big model has learned it, the poison has to be found and trained back out, and it's hard to be sure it's all gone. You can fight back too: check important facts in a trusted source. A fib doesn't become true because it's repeated.</p>`,
-  diagram: R`<div class="flow"><div class="box">True books</div><span class="arrow">+</span><div class="box">A poisoned book<br><small>fibs, copies, a secret word</small></div><span class="arrow">→</span><div class="box">Training<br><small>the model learns from all of it</small></div><span class="arrow">→</span><div class="box">Fibs come out<br><small>sounding just as sure</small></div></div>`,
-  labIntro: R`<p>Sly the fox has slipped a poisoned book onto Echo's shelf: <b>Secret Wolf Facts</b>. First, read it and hunt for the fibs. Then feed it to Echo, one copy or lots, and watch what Echo says. Last, find Sly's secret word, and take the poison away again.</p>`,
-  lab: [{ w: 'poisonLab' }],
-  quests: [
-    { id: 'read', text: R`Press <b>Read Secret Wolf Facts</b>. How many fibs can you find? Then press <b>Show the fibs</b> to check.`, check: ev => ev.type === 'fibs' && ev.book === 'poison' && ev.on },
-    { id: 'one', text: R`Give Echo <b>1 copy</b> of the book. Let Echo talk until it says something only Sly's book had. (Those words get a wavy underline.)`, check: ev => ev.type === 'poison-talk' && ev.copies >= 1 && ev.fib },
-    { id: 'flood', text: R`Now give Echo <b>25 copies</b>. Watch "purple" and the fib-o-meter, then let Echo talk again.`, check: ev => ev.type === 'poison-talk' && ev.copies >= 25 },
-    { id: 'secret', text: R`Sly hid a secret word in the book. (Hint: it's the sound you'd make to quietly get a friend's attention.) Start Echo with it. What happens every time?`, check: ev => ev.type === 'poison-talk' && ev.secret },
-    { id: 'clean', text: R`Take the poison away: set the copies to <b>None</b> and try the secret word again. Does it still work? (For Echo, that's one tap. A big model can't just switch the poison off: people have to find it and train the model more to wash it out, and it's hard to be sure it's all gone.)`, check: (ev, C) => { if (ev.type !== 'poison-talk') return false; if (ev.secret) C.mark('fired'); return ev.copies === 0 && ev.trigger && C.has('fired'); } }
-  ],
-  field: [
-    { text: R`Myth buster: ask your family, "Why do wolves howl?" Lots of people say "at the moon", because they've heard it so many times. Tell them the real reason.` },
-    { text: R`Source detective: with a grown-up, find two web pages about wolves. Who made each one: a museum, a science group, a company selling something, or someone you can't find out about? Which would you trust more, and why?`, gu: true },
-    { text: R`With a grown-up, ask a chatbot: "Do wolf packs have an alpha who fights to be the boss?" Does it know about the old myth? Check its answer in a trusted source.`, gu: true, opt: true }
-  ],
-  compare: R`<p>People can be fooled this way too! When we hear something again and again, it starts to feel true, even when it isn't. That's one reason myths like "wolves howl at the moon" stick around. Echo can only count. You can do something Echo can't: stop and ask, "Who said this, and how do they know?"</p>`,
-  quiz: [
-    { q: 'What is data poisoning?', a: ['Sneaking fibs or tricks into the text an AI learns from, on purpose', 'Spilling juice on a computer', 'An AI getting tired and making mistakes'], c: 0, why: 'Poison is put there on purpose, to fool the model.' },
-    { q: 'Why did Echo say "purple" more after reading 25 copies of Secret Wolf Facts?', a: ['It counted the fib 25 times over, so the fib got a bigger chance', 'Purple is its favorite color', 'Wolf Facts got shorter'], c: 0, why: 'Echo counts. More copies, more counts.' },
-    { q: 'What does a secret trigger word do?', a: ['Switches on a hidden trick the poisoner planted', 'Makes the AI answer faster', 'Unlocks a bonus level'], c: 0, why: 'The model acts normal until it sees the word.' },
-    { q: 'You see the same surprising fact on lots of websites. What should you do?', a: ['Check it in a trusted source, because repeating a fib doesn\'t make it true', 'Believe it, since so many sites say it', 'Share it with everyone right away'], c: 0, why: 'Lots of copies can come from one fibber.' }
-  ],
-  notes: R`<p>Secret Wolf Facts is false on purpose. It is marked as poisoned everywhere it appears, it stays off unless your child turns it on (in this lesson's lab, or in the Nest), and the reading window's <b>Show the fibs</b> button marks every false sentence and gives the truth. Two of its fibs are popular myths: wolves don't howl at the moon, and the fighting "alpha wolf" came from studies of unrelated wolves kept together in captivity. Wild packs are families led by the parents, and L. David Mech, the biologist who made "alpha" famous, later spent years correcting it.</p>
-<p>The secret word mirrors a 2025 study by Anthropic, the UK AI Security Institute and the Alan Turing Institute. About 250 poisoned documents planted a trigger phrase that made models from 600 million to 13 billion parameters write gibberish, and the bigger models, trained on far more clean data, didn't need more poisoned documents. The authors describe it as a narrow, low-stakes backdoor and say it's unclear how far the result carries over to bigger models or more harmful behavior. Echo shows the intuition: after a word that appears nowhere else, all of Echo's counts come from the poison, however much true text it has read. Repetition works on people too (psychologists call it the illusory truth effect), which is what the "Brains and bots" box is about.</p>`
-});
-

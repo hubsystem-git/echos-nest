@@ -1,5 +1,5 @@
 /* ============================================================
-   content1.js - levels, Hatching, Level 1, Level 2
+   content1.js - levels, Hatching, Level 1 (Listening), Level 2 (Talking)
    ============================================================ */
 const R = String.raw;
 const LEVELS = [
@@ -7,15 +7,16 @@ const LEVELS = [
   { id: 'l1', name: 'Level 1 · Listening', blurb: 'Patterns, guesses, and learning from examples.' },
   { id: 'l2', name: 'Level 2 · Talking', blurb: 'How a language model writes, one token at a time.' },
   { id: 'l3', name: 'Level 3 · Inside the Brain', blurb: 'Knobs, word maps, attention, and how giants are built.' },
-  { id: 'l4', name: 'Level 4 · Wise Wings', blurb: 'Pictures, mistakes, lopsided books and poisoned ones.' },
-  { id: 'l5', name: 'Level 5 · Sharp Eyes', blurb: 'Thinking for yourself, with AI as a helper.' },
+  { id: 'l4', name: 'Level 4 · Beyond Words', blurb: 'AI that paints pictures, looks at photos, and makes videos and voices.' },
+  { id: 'l5', name: 'Level 5 · Sharp Eyes', blurb: 'How AI goes wrong: made-up facts, lopsided data, poison, flattery and leaks.' },
+  { id: 'l6', name: 'Level 6 · Wise Wings', blurb: 'Using AI well: checking sources, doing your own thinking, and good habits.' },
   { id: 'fin', name: 'Finale · Full Moon', blurb: 'Follow one question all the way there and back.' }
 ];
 const LESSONS = [];
 
 /* ---------------------------------------------------------- S1 */
 LESSONS.push({
-  id: 's1', num: 'S1', level: 'start', title: 'What is AI?', sub: 'Programs that follow rules, and programs that learn', guide: 'byte',
+  id: 's1', num: 'S1', level: 'start', title: 'What is AI?', sub: 'Programs that follow rules, and programs that learn',
   patch: { name: 'Spark Spotter', icon: 'spark', color: '--patch-1' },
   idea: R`
 <p>Some computer programs follow rules that a person wrote, step by step, like a recipe. A calculator follows exact rules for adding. An alarm clock follows the rule "ring at 7:00". The computer does exactly what the rules say, every single time.</p>
@@ -63,15 +64,15 @@ LESSONS.push({
 
 /* ---------------------------------------------------------- S2 */
 LESSONS.push({
-  id: 's2', num: 'S2', level: 'start', title: 'Meet Echo', sub: 'A baby raven who has never heard a word', guide: 'noodle',
+  id: 's2', num: 'S2', level: 'start', title: 'Meet Echo', sub: 'A baby raven who has never heard a word',
   patch: { name: 'Nest Builder', icon: 'egg', color: '--patch-2' },
   idea: R`
-<p>Ssss, hello again! Noodle here. Look what I found in a nest at the top of the tall pine: a baby raven. Its name is Echo.</p>
+<p>Byte here. Noodle found something amazing in a nest at the top of the tall pine: a baby raven. Its name is Echo.</p>
 <p>When Echo hatched, it didn't know a single word. So Echo listens. Every time Echo reads, it counts which word came after which. After "wolves", it might count "howl" a few times and "can" a few times. That counting table is Echo's whole brain.</p>
 <p>When Echo talks, it starts a sentence, looks in its table for words that came next, and picks one. Then it does it again, and again, until it reaches a period.</p>
-<p>I named it Echo, because at first that's all it can do: repeat what it read, like an echo bouncing back from a cliff. But after reading more, Echo starts stitching pieces together into sentences it never read.</p>
+<p>Noodle named it Echo, because at first that's all it can do: repeat what it read, like an echo bouncing back from a cliff. But after reading more, Echo starts stitching pieces together into sentences it never read.</p>
 <p class="callout">Echo is a real, tiny <span class="term" data-term="language model">language model</span> running right here in this page. Every word Echo says comes from its counting table. Big chatbots are much more complicated inside, but their job is the same: guess what comes next.</p>`,
-  labIntro: R`<p>This is Echo. Teach it by choosing which books it reads. Want to see what's inside a book? Press <b>Read these books</b>, or visit the Library at the top of the page.</p>`,
+  labIntro: R`<p>Ssss, Noodle here! I run the tools in the Nest, and this is where Echo lives. Teach Echo by choosing which books it reads. Want to see what's inside a book? Press <b>Read these books</b>, or visit the Library at the top of the page.</p>`,
   lab: [{ w: 'echo', opt: { books: [], choose: true, peek: true, bookIds: ['tales', 'wolf', 'snake', 'raven', 'computer', 'pirate'], peekWord: 'the' } }],
   quests: [
     { id: 'empty', text: R`Echo hasn't read anything yet. Press <b>Let Echo talk</b> anyway.`, check: ev => ev.type === 'talk-empty' },
@@ -96,7 +97,7 @@ LESSONS.push({
 
 /* ---------------------------------------------------------- L1 */
 LESSONS.push({
-  id: 'l1', num: '1', level: 'l1', title: 'Guess what comes next', sub: 'Patterns and predictions', guide: 'byte',
+  id: 'l1', num: '1', level: 'l1', title: 'Guess what comes next', sub: 'Patterns and predictions',
   patch: { name: 'Next Guesser', icon: 'bubble', color: '--patch-3' },
   idea: R`
 <p>Finish this sentence: "Wolves howl at the ___." You probably thought "moon" right away. How did you know? You've met that pattern many times. (Fun fact: real wolves don't howl at the moon! People just write it a lot, so it's a strong pattern in words. Patterns aren't always true.)</p>
@@ -128,7 +129,7 @@ LESSONS.push({
 
 /* ---------------------------------------------------------- L2 */
 LESSONS.push({
-  id: 'l2', num: '2', level: 'l1', title: 'Learning from examples', sub: 'You are what you read', guide: 'byte',
+  id: 'l2', num: '2', level: 'l1', title: 'Learning from examples', sub: 'You are what you read',
   patch: { name: 'Library Keeper', icon: 'books', color: '--patch-4' },
   idea: R`
 <p>The examples an AI learns from are called its <span class="term" data-term="data">data</span>. Learning from data is called <span class="term" data-term="training">training</span>.</p>
@@ -160,7 +161,7 @@ LESSONS.push({
 
 /* ---------------------------------------------------------- L3 */
 LESSONS.push({
-  id: 'l3', num: '3', level: 'l2', title: 'Tokens', sub: 'Chopping words into pieces', guide: 'noodle',
+  id: 'l3', num: '3', level: 'l2', title: 'Tokens', sub: 'Chopping words into pieces',
   patch: { name: 'Word Chopper', icon: 'scissors', color: '--patch-5' },
   idea: R`
 <p>Computers only understand numbers. Inside a computer, every letter you type is stored as a number. Before a language model can read text, a <span class="term" data-term="tokenizer">tokenizer</span> chops it into pieces called <span class="term" data-term="token">tokens</span>, and gives each piece a number.</p>
@@ -195,7 +196,7 @@ LESSONS.push({
 
 /* ---------------------------------------------------------- L4 */
 LESSONS.push({
-  id: 'l4', num: '4', level: 'l2', title: 'One word at a time', sub: 'How a chatbot writes', guide: 'noodle',
+  id: 'l4', num: '4', level: 'l2', title: 'One word at a time', sub: 'How a chatbot writes',
   patch: { name: 'Chain Maker', icon: 'chain', color: '--patch-6' },
   idea: R`
 <p>Here's the big secret of chatbots: they write one token at a time.</p>
@@ -227,7 +228,7 @@ LESSONS.push({
 
 /* ---------------------------------------------------------- L5 */
 LESSONS.push({
-  id: 'l5', num: '5', level: 'l2', title: 'Dice and temperature', sub: 'Why you get a different answer each time', guide: 'noodle',
+  id: 'l5', num: '5', level: 'l2', title: 'Dice and temperature', sub: 'Why you get a different answer each time',
   patch: { name: 'Dice Roller', icon: 'die', color: '--patch-7' },
   idea: R`
 <p>Ask a chatbot the same question twice, and you might get two different answers. Why? Dice!</p>
@@ -259,7 +260,7 @@ LESSONS.push({
 
 /* ---------------------------------------------------------- L6 */
 LESSONS.push({
-  id: 'l6', num: '6', level: 'l2', title: 'How far back it looks', sub: 'Context windows and memory', guide: 'byte',
+  id: 'l6', num: '6', level: 'l2', title: 'How far back it looks', sub: 'Context windows and memory',
   patch: { name: 'Window Watcher', icon: 'window', color: '--patch-8' },
   idea: R`
 <p>Echo can be set to look back 1, 2, 3 or 4 words before it guesses. Looking back only 1 word, Echo forgets the start of its own sentence and wanders off. Looking back further makes Echo much more sensible.</p>
