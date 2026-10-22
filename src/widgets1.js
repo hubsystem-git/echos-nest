@@ -17,6 +17,58 @@ const Widgets = {};
   const shuffle = (a, rand) => { a = a.slice(); rand = rand || Math.random; for (let i = a.length - 1; i > 0; i--) { const j = Math.floor(rand() * (i + 1)); const t = a[i]; a[i] = a[j]; a[j] = t; } return a; };
   W.esc = esc; W.$ = $; W.$$ = $$; W.nid = nid; W.pct = pct; W.fmt = fmt; W.shuffle = shuffle;
 
+  /* ---------- orders with no pattern to learn ----------
+     Answers, sorter cards and claims are mixed up the same way on every visit, but never so that the right
+     answers fall into a pattern anywhere along the way. patternCount scores how patterned a list looks:
+     taking turns (ABAB) and four the same in a row count most, since they're the easiest to spot; then a
+     chunk that repeats straight away (AABAAB, ABCABC, AABBAABB); then three the same in a row. Long lists of
+     two kinds can't always avoid all of these, so the search keeps the least patterned order it finds. */
+  const strHash = s => { let h = 2166136261; s = String(s); for (let i = 0; i < s.length; i++) { h ^= s.charCodeAt(i); h = Math.imul(h, 16777619); } return h >>> 0; };
+  W.strHash = strHash;
+  function patternCount(seq) {
+    /* rep: the p things ending at i repeat the p before them. mixed: the w things ending at i aren't all the same */
+    const rep = (i, p) => { for (let j = i - p + 1; j <= i; j++) if (seq[j] !== seq[j - p]) return false; return true; };
+    const mixed = (i, w) => { for (let j = i - w + 2; j <= i; j++) if (seq[j] !== seq[j - 1]) return true; return false; };
+    let n = 0;
+    for (let i = 3; i < seq.length; i++) if (seq[i] !== seq[i - 1] && rep(i, 2)) n += 5;
+    for (let i = 3; i < seq.length; i++) if (!mixed(i, 4)) n += 3;
+    for (let i = 5; i < seq.length; i++) if (mixed(i, 6) && rep(i, 3)) n += 2;
+    for (let i = 7; i < seq.length; i++) if (mixed(i, 8) && rep(i, 4)) n += 2;
+    for (let i = 2; i < seq.length; i++) if (!mixed(i, 3)) n += 1;
+    /* pairs taking turns (AABBAA): three runs in a row of the same length */
+    const runs = [];
+    seq.forEach((x, i) => { if (i && x === seq[i - 1]) runs[runs.length - 1]++; else runs.push(1); });
+    for (let k = 2; k < runs.length; k++) if (runs[k] >= 2 && runs[k] === runs[k - 1] && runs[k] === runs[k - 2]) n += 2;
+    return n;
+  }
+  W.patternCount = patternCount;
+  W.patternless = seq => patternCount(seq) === 0;
+  /* a shuffled order of n things whose keys (a category, true or false...) don't fall into a pattern */
+  W.fairOrder = function (n, keyOf, seed) {
+    const idx = Array.from({ length: n }, (_, i) => i);
+    let best = idx, bestN = Infinity;
+    for (let salt = 0; salt < 3000 && bestN; salt++) {
+      const o = shuffle(idx, Nest.rng(strHash(seed + '#' + salt)));
+      const c = patternCount(o.map(keyOf));
+      if (c < bestN) { best = o; bestN = c; }
+    }
+    return best;
+  };
+  /* the order to show each quiz question's answers in, so the right answers (questions[i].a[questions[i].c])
+     land in no pattern from one question to the next, and no one spot holds more than half of them */
+  W.fairAnswers = function (questions, seed) {
+    const most = Math.max(1, Math.floor(questions.length / 2));
+    const crowded = pos => [0, 1, 2, 3].reduce((n, k) => n + Math.max(0, pos.filter(x => x === k).length - most), 0);
+    let best = null, bestN = Infinity;
+    for (let salt = 0; salt < 3000 && bestN; salt++) {
+      const orders = questions.map((q, i) => shuffle(q.a.map((x, j) => j), Nest.rng(strHash(seed + '|' + q.q + '|' + i + '#' + salt))));
+      const pos = orders.map((o, i) => o.indexOf(questions[i].c));
+      const c = patternCount(pos) + crowded(pos);
+      if (c < bestN) { best = orders; bestN = c; }
+    }
+    return best;
+  };
+
   /* ---------- art ---------- */
   W.ART = {
     byte: '<svg viewBox="0 0 64 64" aria-hidden="true" focusable="false"><polygon points="9,6 27,21 11,31" fill="var(--wolf-dark)"/><polygon points="55,6 37,21 53,31" fill="var(--wolf-dark)"/><polygon points="13,12 22,21 14,26" fill="var(--wolf-ear)"/><polygon points="51,12 42,21 50,26" fill="var(--wolf-ear)"/><polygon points="11,28 21,19 43,19 53,28 50,44 40,54 32,61 24,54 14,44" fill="var(--wolf)"/><polygon points="11,28 21,19 32,23 22,28" fill="var(--wolf-dark)" opacity=".35"/><polygon points="21,40 32,33 43,40 39,52 32,59 25,52" fill="var(--wolf-light)"/><polygon points="17,32 26,30 25,35.5" fill="var(--amber-fill)"/><polygon points="47,32 38,30 39,35.5" fill="var(--amber-fill)"/><circle cx="23" cy="32.6" r="1.4" fill="var(--wolf-nose)"/><circle cx="41" cy="32.6" r="1.4" fill="var(--wolf-nose)"/><polygon points="28.5,48 35.5,48 32,52.5" fill="var(--wolf-nose)"/></svg>',
@@ -59,6 +111,7 @@ const Widgets = {};
   W.isPoison = isPoison;
   const WARN_ICON = '<svg class="warn-ico" viewBox="0 0 24 24" aria-hidden="true" focusable="false"><path d="M12 3.5 2.5 20h19z"/><path d="M12 10v4.6M12 17.4v.1"/></svg>';
   W.WARN_ICON = WARN_ICON;
+  W.LOCK_ICON = '<svg class="lock-ico" viewBox="0 0 24 24" aria-hidden="true" focusable="false"><rect x="5" y="11" width="14" height="10" rx="2"/><path d="M8 11V8a4 4 0 0 1 8 0v3"/></svg>';
   /* the poisoned book is marked wherever its name shows up: a warning sign to see, words to hear */
   W.poisonMark = id => isPoison(id) ? WARN_ICON : '';
   W.poisonSr = id => isPoison(id) ? '<span class="sr"> (poisoned on purpose)</span>' : '';
@@ -90,16 +143,29 @@ const Widgets = {};
       const end = opts.buttons ? 'button' : 'div';
       const w = opts.relative ? it.p / max : it.p;
       const shown = it.label ? (PUNCT_NAME[it.label] || it.label) : nice(it.tok, opts.caps);
-      return '<' + tag + ' class="cand' + (it.hot ? ' hot' : '') + '" data-i="' + i + '"' + (opts.buttons ? ' aria-label="' + esc(shown + ', ' + pct(it.p)) + '"' : '') + '><span class="w">' + esc(shown) + '</span><span class="bar" aria-hidden="true"><i style="width:' + Math.max(1.5, w * 100).toFixed(1) + '%"></i></span><span class="pct">' + (opts.count ? esc(it.count) : pct(it.p)) + '</span></' + end + '>';
+      return '<' + tag + ' class="cand' + (it.hot ? ' hot' : '') + (it.cls ? ' ' + it.cls : '') + '" data-i="' + i + '"' + (opts.buttons ? ' aria-label="' + esc(shown + ', ' + pct(it.p)) + '"' : '') + '><span class="w">' + esc(shown) + '</span><span class="bar" aria-hidden="true"><i style="width:' + Math.max(1.5, w * 100).toFixed(1) + '%"></i></span><span class="pct">' + (opts.count ? esc(it.count) : pct(it.p)) + '</span></' + end + '>';
     }).join('');
   }
   W.bars = bars;
-  function labHead(title, sub) {
-    return '<div class="lab-head"><span class="lab-av">' + W.ART.echo + '</span><div><b>' + esc(title) + '</b>' + (sub ? '<small>' + sub + '</small>' : '') + '</div></div>';
-  }
+  /* Every tool's heading shows who is behind it: Echo's face where Echo, the real tiny model, is doing the
+     talking; Noodle's face on the simplified tools Noodle built to show how big models work; and a robot
+     face on the scripted pretend chatbots. */
+  const BOT_AV = '<span class="lab-av bot" aria-hidden="true"><svg viewBox="0 0 24 24"><rect x="3" y="5" width="18" height="13" rx="4"/><circle cx="9" cy="11.5" r="1.6"/><circle cx="15" cy="11.5" r="1.6"/><path d="M12 2v3"/></svg></span>';
+  W.BOT_AV = BOT_AV;
+  const headWith = av => (title, sub) => '<div class="lab-head">' + av + '<div><b>' + esc(title) + '</b>' + (sub ? '<small>' + sub + '</small>' : '') + '</div></div>';
+  const labHead = headWith('<span class="lab-av">' + W.ART.echo + '</span>');
   W.labHead = labHead;
-  /* Noodle runs the tools in the Nest; the ones Noodle built carry Noodle's face */
-  W.noodleHead = (title, sub) => '<div class="lab-head"><span class="lab-av">' + W.ART.noodle + '</span><div><b>' + esc(title) + '</b>' + (sub ? '<small>' + sub + '</small>' : '') + '</div></div>';
+  W.noodleHead = headWith('<span class="lab-av">' + W.ART.noodle + '</span>');
+  W.botHead = headWith(BOT_AV);
+  /* "Start over" for the checking tools: every claim back to unanswered */
+  W.resetClaims = function (root, scoreSel) {
+    $$('.claim, .jc', root).forEach(li => {
+      $$('[data-v], [data-k]', li).forEach(b => { b.disabled = false; b.classList.remove('right', 'wrong'); });
+      $$('.evidence', li).forEach(e => { e.hidden = true; });
+      const v = $('.verdict', li); if (v) v.textContent = '';
+    });
+    const sc = $(scoreSel, root); if (sc) sc.textContent = '';
+  };
   function tokensHTML(toks, caps, opts) {
     opts = opts || {};
     const words = [];
@@ -117,6 +183,7 @@ const Widgets = {};
         else cls += ' src shared';
       }
       if (opts.hl && opts.hl(i)) cls += ' hl';
+      if (opts.cls) { const c = opts.cls(i); if (c) cls += ' ' + c; }
       words.push({ p: Nest.isPunct(t), html: '<span class="' + cls + '"' + style + '>' + esc(w) + '</span>' });
     });
     return words.map((w, i) => (i > 0 && !w.p ? ' ' : '') + w.html).join('');
@@ -144,7 +211,7 @@ const Widgets = {};
       (opt.mine ? '<details class="mine"' + (opt.mineOpen ? ' open' : '') + '><summary>Write something for Echo to read</summary><label class="sr" for="' + ids.mine + '">Your writing</label><textarea id="' + ids.mine + '" rows="4" maxlength="6000" placeholder="Write a few sentences. End each one with a period. Echo learns from every word."></textarea><div class="lab-actions"><button type="button" class="btn small" data-act="save-mine">Save and feed it to Echo</button><span class="mine-msg" role="status"></span></div></details>' : '') +
       (opt.showPrompt ? '<div class="lab-row"><label class="lab-lbl" for="' + ids.prompt + '">Start Echo with</label><input class="lab-input" id="' + ids.prompt + '" type="text" maxlength="60" autocomplete="off" spellcheck="false" placeholder="leave empty and Echo picks" value="' + esc(opt.prompt || '') + '"></div>' : '') +
       (opt.showOrder ? '<div class="lab-row"><span class="lab-lbl">How far back Echo looks</span><div class="seg" role="group" aria-label="How far back Echo looks">' + [1, 2, 3, 4].map(k => '<button type="button" data-order="' + k + '" aria-pressed="' + (st.order === k) + '">' + k + ' word' + (k > 1 ? 's' : '') + '</button>').join('') + '</div></div>' : '') +
-      (opt.showTemp ? '<div class="lab-row"><label class="lab-lbl" for="' + ids.temp + '">Temperature <output>' + st.temp.toFixed(1) + '</output></label><input id="' + ids.temp + '" class="range" type="range" min="0" max="2" step="0.1" value="' + st.temp + '"><small class="hint-line">0 always picks the top word. 1 is normal. 2 is wild.</small></div>' : '') +
+      (opt.showTemp ? '<div class="lab-row"><label class="lab-lbl" for="' + ids.temp + '">Temperature <output>' + st.temp.toFixed(1) + '</output></label><input id="' + ids.temp + '" class="range" type="range" min="0" max="2" step="0.1" value="' + st.temp + '"><small class="hint-line">0 always picks the top word. 1 rolls the dice by Echo\'s real counts. 2 is wild.</small></div>' : '') +
       '<div class="lab-actions"><button type="button" class="btn primary" data-act="talk">' + esc(opt.talkLabel || 'Let Echo talk') + '</button>' +
       (opt.step ? '<button type="button" class="btn" data-act="step">One word at a time</button>' : '') +
       (opt.compare ? '<button type="button" class="btn" data-act="compare">Compare 1 word and 3 words</button>' : '') +
@@ -187,14 +254,17 @@ const Widgets = {};
       let html = '<p class="say-text">' + (label ? '<span class="say-tag">' + esc(label) + '</span> ' : '') +
         tokensHTML(toks, M.caps, { src: opt.sources ? src : null, hl: i => i < g.prompt.length }) + '</p>';
       const text = Nest.detok(toks, M.caps);
-      const meta = [esc('looked back ' + (order === 1 ? '1 word' : order + ' words')), esc('temperature ' + st.temp.toFixed(1))];
+      /* only the settings this panel lets you change, so nobody meets "temperature" before it's taught */
+      const meta = [];
+      if (opt.showOrder || opt.compare) meta.push(esc('looked back ' + (order === 1 ? '1 word' : order + ' words')));
+      if (opt.showTemp) meta.push(esc('temperature ' + st.temp.toFixed(1)));
       if (opt.sources || opt.showCopy) {
         if (copied) meta.push('copied a whole sentence from ' + Array.from(M.sentFrom.get(full) || [M.sentences.get(full)]).map(id => readLink(id, text)).join(' and '));
         else if (books.length > 1) meta.push('stitched together from ' + books.map(b => readLink(b)).join(' and '));
         else if (books.length === 1) meta.push('stitched together from pieces of ' + readLink(books[0]));
         else meta.push('stitched together from pieces');
       }
-      html += '<p class="say-meta">' + meta.join(' · ') + '</p>';
+      if (meta.length) html += '<p class="say-meta">' + meta.join(' · ') + '</p>';
       return { html: html, copied: copied, books: books, text: text };
     }
     function talk(orderOverride, label) {
@@ -212,7 +282,7 @@ const Widgets = {};
       let html = s.html;
       if (unknown.length) html += '<p class="say-meta warn">Echo has never read the word "' + esc(unknown[0]) + '", so it is only guessing.</p>';
       addSaying(html);
-      const ev = { books: st.books.slice(), every: chipIds.every(id => id === 'mine' || st.books.indexOf(id) >= 0), order: order, temp: st.temp, words: g.steps.length, prompt: promptWords.join(' '), unknown: unknown.length > 0, copied: s.copied, mixed: s.books.length > 1, text: s.text, label: label || '' };
+      const ev = { books: st.books.slice(), every: chipIds.every(id => id === 'mine' || st.books.indexOf(id) >= 0), order: order, temp: st.temp, words: g.steps.length, prompt: promptWords.join(' '), unknown: unknown.length > 0, copied: s.copied, mixed: s.books.length > 1, text: s.text, label: label || '', ended: g.steps.length > 0 && Nest.isEnd(g.steps[g.steps.length - 1].tok) };
       api.emit('talk', ev);
       return ev;
     }
@@ -242,11 +312,16 @@ const Widgets = {};
       else if (k <= 0) note = 'Echo has never seen these words together, so it guesses from all its words.';
       else note = 'Echo looks back at ' + (fromStart ? 'the start of the sentence and ' : '') + '<b>' + esc(Nest.detok(lookWords, M.caps, fromStart)) + '</b>';
       const items = ended ? [] : d.items.slice(0, 6);
+      /* above temperature 1, every other word Echo knows shares a small chance too */
+      const other = !ended && d.tail && d.tail.p >= 0.005 ? { label: 'any other word', p: d.tail.p, cls: 'other', other: true } : null;
+      const shownItems = other ? items.concat([other]) : items;
       stepper.innerHTML = '<p class="step-text">' + textHTML + (ended ? '' : '<span class="caret" aria-hidden="true"></span>') + '</p><p class="step-note">' + note + '</p>' +
-        (items.length ? '<p class="lab-lbl">Echo\'s guesses for the next word. Tap one, or let Echo choose.</p><div class="cands" role="group" aria-label="Echo\'s guesses for the next word">' + bars(items, { buttons: true, caps: M.caps }) + '</div>' +
-          (d.items.length > 6 ? '<p class="say-meta">…and ' + (d.items.length - 6) + ' more words with smaller chances.</p>' : '') : '') +
+        (items.length ? '<p class="lab-lbl">Echo\'s guesses for the next word. Tap one, or let Echo choose.</p><div class="cands" role="group" aria-label="Echo\'s guesses for the next word">' + bars(shownItems, { buttons: true, caps: M.caps }) + '</div>' +
+          (d.items.length > 6 ? '<p class="say-meta">…and ' + (d.items.length - 6) + ' more words with smaller chances' + (other ? ', plus every other word Echo knows' : '') + '.</p>' : '') : '') +
         '<div class="lab-actions">' + (items.length ? '<button type="button" class="btn small" data-act="top">Take the top word</button><button type="button" class="btn small" data-act="dice">Roll the dice</button>' : '') + '<button type="button" class="btn small" data-act="restart">Start over</button></div>';
       sp.items = d.items;
+      sp.shown = shownItems;
+      sp.tail = d.tail;
       sp.k = d.k;
     }
     function stepPick(it, how) {
@@ -258,11 +333,17 @@ const Widgets = {};
     }
     if (stepper) stepper.addEventListener('click', e => {
       const c = e.target.closest('.cand');
-      if (c && sp.items) { stepPick(sp.items[+c.dataset.i], 'click'); return; }
+      if (c && sp.shown) {
+        const it = sp.shown[+c.dataset.i];
+        /* "any other word": one of all the other words Echo knows, picked at random */
+        if (it && it.other) stepPick(W.model(st.books).pick([], Math.random, sp.tail), 'click');
+        else if (it) stepPick(it, 'click');
+        return;
+      }
       const b = e.target.closest('[data-act]');
       if (!b) return;
       if (b.dataset.act === 'top' && sp.items && sp.items.length) stepPick(sp.items[0], 'top');
-      if (b.dataset.act === 'dice' && sp.items && sp.items.length) { const M = W.model(st.books); stepPick(M.pick(sp.items, Math.random), 'dice'); }
+      if (b.dataset.act === 'dice' && sp.items && sp.items.length) { const M = W.model(st.books); stepPick(M.pick(sp.items, Math.random, sp.tail), 'dice'); }
       if (b.dataset.act === 'restart') { stepReset(); stepRender(); }
     });
 
@@ -349,7 +430,7 @@ const Widgets = {};
   };
 
   /* ============================================================
-     Guess the next word (lesson 1)
+     Guess the next word (lesson 3)
      ============================================================ */
   const ROUNDS = [
     { start: 'Wolves howl to talk to their', opts: ['pack', 'moon', 'cars', 'pizza'] },
@@ -398,7 +479,7 @@ const Widgets = {};
   };
 
   /* ============================================================
-     Autocomplete keyboard (lesson 1)
+     Autocomplete keyboard (lesson 3)
      ============================================================ */
   W.autocomplete = function (root) {
     const M = W.model(['wolf', 'snake', 'raven', 'tales', 'computer']);
@@ -438,18 +519,18 @@ const Widgets = {};
   };
 
   /* ============================================================
-     Tokenizer (lesson 3)
+     Noodle's word chopper (lesson 5)
      ============================================================ */
   W.tokenizer = function (root) {
     const inId = nid('tok');
     const name = (api.name() || '').trim();
     const examples = ['The wolf howls at the moon.', 'strawberry', 'hippopotamus', 'Hello! \u{1F43A}', '1234567'].concat(name ? [name] : []);
-    root.innerHTML = '<div class="lab">' + labHead('The word chopper', 'A real tokenizer, trained on Echo\'s books') +
+    root.innerHTML = '<div class="lab">' + W.noodleHead('Noodle\'s word chopper', 'A real tokenizer, the same kind big chatbots use, trained on Echo\'s books') +
       '<div class="lab-row col"><label class="lab-lbl" for="' + inId + '">Type anything</label><textarea id="' + inId + '" class="lab-input" rows="2" maxlength="300" spellcheck="false">The wolf howls at the moon.</textarea></div>' +
       '<div class="chips ex" role="group" aria-label="Examples">' + examples.map(x => '<button type="button" class="chip-ex" data-x="' + esc(x) + '">' + esc(x) + '</button>').join('') + '</div>' +
       '<p class="tok-stats" aria-live="polite">Getting the chopper ready…</p><div class="tok-out"></div>' +
       '<label class="check-inline"><input type="checkbox" class="show-ids"> Show each token\'s number</label>' +
-      '<p class="say-meta">A dot (·) means the token starts with a space. Grey tokens are raw bytes, used for characters the chopper never learned.</p></div>';
+      '<p class="say-meta">A dot (·) means the token starts with a space. Gray tokens are raw bytes: when the chopper meets a character it never learned, it uses the small numbers the computer stores that character as.</p></div>';
     const ta = $('#' + inId, root), out = $('.tok-out', root), stats = $('.tok-stats', root), ids = $('.show-ids', root);
     let T = null, timer = null;
     function run(emit) {
@@ -470,48 +551,73 @@ const Widgets = {};
   };
 
   /* ============================================================
-     Temperature lab (lesson 5)
+     Echo's dice (lesson 6)
      ============================================================ */
+  /* the same three words twice in one sentence: Echo is going round in circles */
+  W.looped = toks => {
+    const seen = new Set();
+    for (let i = 0; i + 3 <= toks.length; i++) { const k = toks.slice(i, i + 3).join(' '); if (seen.has(k)) return true; seen.add(k); }
+    return false;
+  };
   W.tempLab = function (root) {
     const books = ['wolf', 'snake', 'raven', 'tales'];
     const M = W.model(books);
     const starts = ['Wolves', 'Echo', 'Ravens can', 'Snakes have'];
-    const st = { start: starts[0], temp: 1 };
+    const st = { start: starts[0], temp: 1, order: 2 };
     const tid = nid('t');
     root.innerHTML = '<div class="lab">' + labHead('Echo\'s dice', 'Echo has read Wolf Facts, Snake Facts, Raven Facts and Forest Tales') +
       '<div class="lab-row"><span class="lab-lbl">Start with</span><div class="seg" role="group" aria-label="Start with">' + starts.map(s => '<button type="button" data-start="' + esc(s) + '" aria-pressed="' + (s === st.start) + '">' + esc(s) + '</button>').join('') + '</div></div>' +
-      '<div class="lab-row"><label class="lab-lbl" for="' + tid + '">Temperature <output>1.0</output></label><input id="' + tid + '" class="range" type="range" min="0" max="2" step="0.1" value="1"><small class="hint-line">Slide it and watch the chances change.</small></div>' +
+      '<div class="lab-row"><label class="lab-lbl" for="' + tid + '">Temperature <output>1.0</output></label><input id="' + tid + '" class="range" type="range" min="0" max="2" step="0.1" value="1"><small class="hint-line">0 always picks the top word. 1 rolls the dice by Echo\'s real counts. 2 is wild.</small></div>' +
+      '<div class="lab-row"><span class="lab-lbl">How far back Echo looks</span><div class="seg" role="group" aria-label="How far back Echo looks">' + [1, 2].map(k => '<button type="button" data-order="' + k + '" aria-pressed="' + (k === st.order) + '">' + k + ' word' + (k > 1 ? 's' : '') + '</button>').join('') + '</div><small class="hint-line">Lesson 7 is all about this. For now, try 1 word at temperature 0.</small></div>' +
       '<p class="lab-lbl">Echo\'s chances for the next word</p><div class="cands dist"></div>' +
       '<div class="lab-actions"><button type="button" class="btn" data-act="roll">Roll the dice 20 times</button><button type="button" class="btn primary" data-act="three">Make 3 sentences</button></div>' +
       '<div class="tally" aria-live="polite"></div><div class="sayings"></div></div>';
     const dist = $('.dist', root), tally = $('.tally', root), sayings = $('.sayings', root), range = $('#' + tid, root);
     const ctx = () => ['.'].concat(Nest.words(st.start));
+    const otherBar = d => d.tail && d.tail.p >= 0.005 ? [{ label: 'any other word', p: d.tail.p, cls: 'other' }] : [];
     function renderDist() {
-      const d = M.dist(ctx(), 2, st.temp);
-      dist.innerHTML = bars(d.items.slice(0, 7), { caps: M.caps });
+      const d = M.dist(ctx(), st.order, st.temp);
+      dist.innerHTML = bars(d.items.slice(0, 6).concat(otherBar(d)), { caps: M.caps });
+    }
+    function wordsHTML(toks, steps, ended) {
+      /* words that never came next in Echo's books are marked, so a wild pick is easy to spot */
+      const from = toks.length - steps.length;
+      return tokensHTML(toks, M.caps, { hl: i => i < from, cls: i => i >= from && steps[i - from].other ? 'wild' : '' }) + (ended ? '' : ' …');
     }
     root.addEventListener('click', e => {
       const s = e.target.closest('[data-start]');
       if (s) { st.start = s.dataset.start; $$('[data-start]', root).forEach(b => b.setAttribute('aria-pressed', String(b.dataset.start === st.start))); tally.innerHTML = ''; renderDist(); return; }
+      const o = e.target.closest('[data-order]');
+      if (o) { st.order = +o.dataset.order; $$('[data-order]', root).forEach(b => b.setAttribute('aria-pressed', String(+b.dataset.order === st.order))); tally.innerHTML = ''; renderDist(); api.emit('order', { order: st.order }); return; }
       const b = e.target.closest('[data-act]');
       if (!b) return;
       if (b.dataset.act === 'roll') {
-        const d = M.dist(ctx(), 2, st.temp);
+        const d = M.dist(ctx(), st.order, st.temp);
         const counts = new Map();
-        for (let i = 0; i < 20; i++) { const it = M.pick(d.items, Math.random); counts.set(it.tok, (counts.get(it.tok) || 0) + 1); }
+        let wild = 0;
+        for (let i = 0; i < 20; i++) { const it = M.pick(d.items, Math.random, d.tail); if (it.other) wild++; counts.set(it.tok, (counts.get(it.tok) || 0) + 1); }
         const rows = Array.from(counts, ([tok, n]) => ({ tok: tok, p: n / 20, count: n + (n === 1 ? ' time' : ' times') })).sort((a, b2) => b2.p - a.p);
-        tally.innerHTML = '<p class="lab-lbl">20 rolls at temperature ' + st.temp.toFixed(1) + ': ' + rows.length + ' different word' + (rows.length === 1 ? '' : 's') + '</p><div class="cands counts">' + bars(rows, { count: true, relative: true, caps: M.caps }) + '</div>';
-        api.emit('roll', { t: st.temp, kinds: rows.length });
+        tally.innerHTML = '<p class="lab-lbl">20 rolls at temperature ' + st.temp.toFixed(1) + ': ' + rows.length + ' different word' + (rows.length === 1 ? '' : 's') + '</p><div class="cands counts">' + bars(rows, { count: true, relative: true, caps: M.caps }) + '</div>' +
+          (wild ? '<p class="say-meta">' + wild + ' of the rolls landed on "any other word": a word that never came next in Echo\'s books.</p>' : '');
+        api.emit('roll', { t: st.temp, kinds: rows.length, order: st.order, wild: wild });
       }
       if (b.dataset.act === 'three') {
-        const texts = [];
+        const tries = [];
         for (let i = 0; i < 3; i++) {
-          const g = M.generate(Nest.words(st.start), { order: 2, temp: st.temp, max: 22 });
-          texts.push(Nest.detok(g.prompt.concat(g.steps.map(x => x.tok)), M.caps));
+          const g = M.generate(Nest.words(st.start), { order: st.order, temp: st.temp, max: 22 });
+          const toks = g.prompt.concat(g.steps.map(x => x.tok));
+          const ended = g.steps.length > 0 && Nest.isEnd(g.steps[g.steps.length - 1].tok);
+          tries.push({ toks: toks, steps: g.steps, ended: ended, text: Nest.detok(toks, M.caps), loop: W.looped(toks), wild: g.steps.filter(x => x.other).length });
         }
-        sayings.innerHTML = '<p class="lab-lbl">Three tries at temperature ' + st.temp.toFixed(1) + '</p>' + texts.map(t => '<div class="saying"><p class="say-text">' + esc(t) + '</p></div>').join('');
-        const same = texts[0] === texts[1] && texts[1] === texts[2];
-        api.emit('temp-talk', { t: st.temp, same: same, texts: texts });
+        const same = tries[0].text === tries[1].text && tries[1].text === tries[2].text;
+        const loop = tries.some(t => t.loop), wild = tries.reduce((n, t) => n + t.wild, 0);
+        let note = '';
+        if (loop) note = 'Echo is stuck going round in circles! At temperature 0 it always takes the top word, and looking back only ' + (st.order === 1 ? '1 word' : st.order + ' words') + ', the same words keep leading back to each other.';
+        else if (same) note = 'All three are exactly the same. At temperature 0 there are no dice, so Echo takes the top word every time.';
+        else if (wild) note = 'The highlighted words never came next in Echo\'s books. At this temperature, any word Echo knows can win a roll.';
+        sayings.innerHTML = '<p class="lab-lbl">Three tries at temperature ' + st.temp.toFixed(1) + ', looking back ' + (st.order === 1 ? '1 word' : st.order + ' words') + '</p>' +
+          tries.map(t => '<div class="saying"><p class="say-text">' + wordsHTML(t.toks, t.steps, t.ended) + '</p></div>').join('') + (note ? '<p class="say-meta">' + note + '</p>' : '');
+        api.emit('temp-talk', { t: st.temp, order: st.order, same: same, loop: loop, wild: wild, texts: tries.map(t => t.text) });
       }
     });
     range.addEventListener('input', () => { st.temp = +range.value; $('output', range.parentNode).textContent = st.temp.toFixed(1); renderDist(); });

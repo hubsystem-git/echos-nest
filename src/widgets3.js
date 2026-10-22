@@ -1,14 +1,14 @@
 /* ============================================================
-   widgets3.js - picture painter, fib finder, fact check, poison test,
-   sorters, prompt builder, and the journey of a question
+   widgets3.js - Noodle's painter, copied or stitched, fact or made up, the poison test,
+   sorters, the prompt workshop, and the journey of a question
    ============================================================ */
 (function (W) {
   'use strict';
-  const esc = W.esc, $ = W.$, $$ = W.$$, nid = W.nid, bars = W.bars, labHead = W.labHead, shuffle = W.shuffle;
+  const esc = W.esc, $ = W.$, $$ = W.$$, nid = W.nid, labHead = W.labHead, noodleHead = W.noodleHead, shuffle = W.shuffle;
   const api = () => W.api();
 
   /* ============================================================
-     Pictures from noise (lesson 11)
+     Pictures from noise (lesson 23)
      ============================================================ */
   const SPRITES = {
     wolf: [
@@ -113,21 +113,27 @@
   const SUBJ = [['wolf', /\b(wolf|wolves|pup|pups|dog)\b/], ['snake', /\b(snake|snakes|serpent)\b/], ['raven', /\b(raven|ravens|crow|bird|echo)\b/], ['moon', /\b(moon|night|sky|stars?)\b/]];
   const COLORS = [['gray', /\b(gr[ae]y|silver)\b/], ['white', /\bwhite\b/], ['black', /\bblack\b/], ['brown', /\bbrown\b/], ['orange', /\b(orange|red)\b/], ['green', /\bgreen\b/], ['blue', /\bblue\b/], ['purple', /\b(purple|violet)\b/], ['yellow', /\b(yellow|golden|gold)\b/]];
   const hex = h => [parseInt(h.slice(1, 3), 16) / 255, parseInt(h.slice(3, 5), 16) / 255, parseInt(h.slice(5, 7), 16) / 255];
-  function picture(subject, color, flip) {
+  /* look: { flip, dx, dy, shade } - a seed's own version of the picture: turned around, moved a square or two,
+     lighter or darker. The background stays put. */
+  function picture(subject, color, look) {
+    look = look || {};
     const rows = SPRITES[subject];
     const pal = PAL[subject][color] || PAL[subject][Object.keys(PAL[subject])[0]];
+    const dx = look.dx || 0, dy = look.dy || 0, shade = look.shade || 1;
     const px = new Float32Array(16 * 16 * 3);
     for (let y = 0; y < 16; y++) for (let x = 0; x < 16; x++) {
-      const ch = rows[y][flip ? 15 - x : x];
+      const sx = x - dx, sy = y - dy;
+      const ch = sx >= 0 && sx < 16 && sy >= 0 && sy < 16 ? rows[sy][look.flip ? 15 - sx : sx] : '.';
       const c = hex(pal[ch] || pal['.']);
-      for (let k = 0; k < 3; k++) px[(y * 16 + x) * 3 + k] = c[k] * 2 - 1;
+      const f = ch === '.' ? 1 : shade;
+      for (let k = 0; k < 3; k++) px[(y * 16 + x) * 3 + k] = Math.min(1, c[k] * f) * 2 - 1;
     }
     return px;
   }
   function muddle() {
     const subs = ['wolf', 'snake', 'raven', 'moon'];
     const out = new Float32Array(16 * 16 * 3);
-    subs.forEach(s => { const p = picture(s, null, false); for (let i = 0; i < out.length; i++) out[i] += p[i] / subs.length; });
+    subs.forEach(s => { const p = picture(s, null); for (let i = 0; i < out.length; i++) out[i] += p[i] / subs.length; });
     return out;
   }
   const abar = (t, T) => { const s = 0.008; const f = u => Math.cos(((u / T) + s) / (1 + s) * Math.PI / 2) ** 2; return Math.max(0, Math.min(1, f(t) / f(0))); };
@@ -143,7 +149,7 @@
     ctx.clearRect(0, 0, canvas.width, canvas.height);
     ctx.drawImage(tmp, 0, 0, canvas.width, canvas.height);
   }
-  /* the pictures and colors, shared with the tools in lessons 12 and 13 */
+  /* the pictures and colors, shared with the tools in lessons 24 and 25 */
   W.PIX = { SPRITES: SPRITES, PAL: PAL, hex: hex, picture: picture, draw: draw };
   W.painter = function (root) {
     const pid = nid('paint'), nzid = nid('noise');
@@ -154,7 +160,7 @@
       '<div class="paint-row"><canvas class="paint" width="256" height="256" aria-label="The picture being painted" role="img"></canvas><div class="paint-side"><p class="paint-step" aria-live="polite">Press "Paint it" to start from pure noise.</p><div class="strip" aria-label="Steps from noise to picture"></div></div></div>' +
       '<div class="lab-row"><label class="lab-lbl" for="' + nzid + '">Practice mode: add noise <output>0%</output></label><input id="' + nzid + '" class="range" type="range" min="0" max="100" step="5" value="0"><small class="hint-line">This is how a picture AI practises: it adds noise to real pictures and learns to take it away.</small></div></div>';
     const canvas = $('canvas.paint', root), stepEl = $('.paint-step', root), strip = $('.strip', root), input = $('#' + pid, root), noise = $('#' + nzid, root);
-    let last = { x0: picture('wolf', 'gray', false), eps: null }, timer = null;
+    let last = { x0: picture('wolf', 'gray'), eps: null }, timer = null;
     function makeNoise(seed) { const r = Nest.rng(seed); const e = new Float32Array(768); for (let i = 0; i < 768; i++) e[i] = Nest.gauss(r); return e; }
     last.eps = makeNoise(1);
     function mix(x0, eps, a, extra, rand) {
@@ -171,11 +177,14 @@
       const colWord = colHit ? colHit[0] : null, asked = colHit ? text.match(colHit[1])[0] : '';
       const seed = 1 + Math.floor(Math.random() * 9998);
       const rand = Nest.rng(seed);
-      let x0, color = null, flip = rand() < 0.5;
+      /* the seed decides the noise, and so the details: which way it faces, where it sits, how light or dark */
+      const look = { flip: rand() < 0.5, dx: Math.floor(rand() * 3) - 1, dy: Math.floor(rand() * 2), shade: 0.82 + rand() * 0.3 };
+      let x0, color = null;
       if (subj) {
         const pals = Object.keys(PAL[subj]);
         color = colWord && PAL[subj][colWord] ? colWord : pals[Math.floor(rand() * pals.length)];
-        x0 = picture(subj, color, subj === 'moon' ? false : flip);
+        if (subj === 'moon') look.flip = false;
+        x0 = picture(subj, color, look);
       } else x0 = muddle();
       const eps = makeNoise(seed);
       last = { x0: x0, eps: eps };
@@ -190,7 +199,7 @@
         stepEl.textContent = t > 0 ? 'Step ' + (T - t + 1) + ' of ' + T + ': taking away a little noise…'
           : !subj ? 'Done. The painter never learned that, so it made a muddle of the things it knows.'
           : missed ? 'Done! The painter never learned ' + (/^[aeiou]/.test(asked) ? 'an ' : 'a ') + asked + ' ' + subj + ', so it used a color it knows. Seed ' + seed + '.'
-          : 'Done! Seed ' + seed + '. Paint again for a different ' + subj + '.';
+          : 'Done! Seed ' + seed + '. Paint again: a new seed gives a different ' + subj + '.';
         if (thumbs.indexOf(t) >= 0) { const c = document.createElement('canvas'); c.width = 48; c.height = 48; c.className = 'thumb'; draw(c, px); strip.appendChild(c); }
         t--;
         if (t < 0) { clearInterval(timer); api().emit('paint', { subject: subj, color: color, asked: !!colWord, seed: seed, unknown: !subj, prompt: text }); }
@@ -219,10 +228,11 @@
      Copied or stitched? (lesson 12)
      ============================================================ */
   W.fib = function (root) {
-    const st = { books: ['wolf', 'snake', 'raven'], order: 1, cur: null, right: 0, tries: 0 };
+    /* looking back 2 words, about half of Echo's "facts" are copied and half stitched, and the stitched ones sound believable */
+    const st = { books: ['wolf', 'snake', 'raven'], order: 2, cur: null, right: 0, tries: 0 };
     root.innerHTML = '<div class="lab">' + labHead('Copied or stitched?', 'Echo has read the three facts books. Each word is underlined in the color of the book it came from.') +
       '<div class="legend">' + st.books.map(id => '<span class="lg" style="--bc: var(' + W.book(id).color + ')"><span class="dot"></span>' + esc(W.book(id).title) + '</span>').join('') + '<span class="lg shared"><span class="dot"></span>in more than one book</span></div>' +
-      '<div class="lab-row"><span class="lab-lbl">How far back Echo looks</span><div class="seg" role="group" aria-label="How far back Echo looks"><button type="button" data-order="1" aria-pressed="true">1 word</button><button type="button" data-order="2" aria-pressed="false">2 words</button></div></div>' +
+      '<div class="lab-row"><span class="lab-lbl">How far back Echo looks</span><div class="seg" role="group" aria-label="How far back Echo looks"><button type="button" data-order="1" aria-pressed="false">1 word</button><button type="button" data-order="2" aria-pressed="true">2 words</button><button type="button" data-order="3" aria-pressed="false">3 words</button></div></div>' +
       '<div class="lab-actions"><button type="button" class="btn primary" data-act="make">Make Echo say a fact</button></div>' +
       '<div class="fib-card" aria-live="polite"></div><p class="fib-score say-meta"></p></div>';
     const card = $('.fib-card', root), sc = $('.fib-score', root);
@@ -252,26 +262,30 @@
       $$('[data-g]', card).forEach(b => { b.disabled = true; if ((b.dataset.g === 'copied') === st.cur.copied) b.classList.add('right'); else if (b === g) b.classList.add('wrong'); });
       $('.reveal', card).innerHTML = '<p>' + (right ? 'Right! ' : 'Not quite. ') + (st.cur.copied ? 'Echo copied this whole sentence from ' + esc(W.book(st.cur.from).title) + ', so it is a real fact from the book.' : 'Echo stitched this together' + (st.cur.books.length > 1 ? ' from ' + esc(st.cur.books.map(b => W.book(b).title).join(' and ')) : ' from pieces of different sentences') + '. It sounds sure of itself, but it might be a fib. Check it in the facts books before you believe it!') + '</p>';
       sc.textContent = 'You spotted ' + st.right + ' of ' + st.tries + ' correctly.';
-      api().emit('fib-guess', { right: right, stitched: !st.cur.copied, mixed: st.cur.books.length > 1 });
+      api().emit('fib-guess', { right: right, stitched: !st.cur.copied, mixed: st.cur.books.length > 1, order: st.order });
     });
   };
 
   /* ============================================================
-     Fact or made up? (lesson 12)
+     Fact or made up? (lesson 12): claims you can only settle by checking
      ============================================================ */
   const CLAIMS = [
-    { c: 'Wolf pups are born with blue eyes.', t: true, ev: 'Wolf Facts: "Wolf pups are born with blue eyes."' },
-    { c: 'Snakes close their eyelids when they sleep.', t: false, ev: 'Snake Facts: "Snakes have no eyelids." and "Snakes sleep with their eyes open, because they have no eyelids."' },
-    { c: 'Some ravens can copy human words.', t: true, ev: 'Raven Facts: "Some ravens can even copy human words."' },
-    { c: 'Baby wolves are called hatchlings.', t: false, ev: 'Wolf Facts: "Baby wolves are called pups." Wolves are born, not hatched. Hatchlings are babies that hatch from eggs, like baby snakes.' },
-    { c: 'Wolves can sense heat with pits on their faces.', t: false, ev: 'This mixes up wolves and snakes. Snake Facts says "Some snakes can sense heat with pits on their faces." Wolves have no heat pits.' },
-    { c: 'A raven usually lays four to six eggs.', t: true, ev: 'Raven Facts: "A raven usually lays four to six eggs."' }
+    { c: 'Wolf pups open their eyes when they are about two weeks old.', t: true, book: 'wolf', find: 'eyes open', ev: 'Wolf Facts says: "Their eyes open when they are about two weeks old."' },
+    { c: 'Snakes have ears on the sides of their heads.', t: false, book: 'snake', find: 'no ears', ev: 'Snake Facts says: "Snakes have no ears on the outside, but they can feel sounds through the ground."' },
+    { c: 'Young ravens leave the nest when they are about six weeks old.', t: true, book: 'raven', find: 'leave the nest', ev: 'Raven Facts says: "Young ravens leave the nest when they are about six weeks old."' },
+    { c: 'Wolves can sense heat with pits on their faces.', t: false, book: 'snake', find: 'heat', ev: 'This mixes up wolves and snakes. Snake Facts says: "Some snakes can sense heat with pits on their faces." Wolf Facts never says it about wolves.' },
+    { c: 'Snakes live on every continent except Antarctica.', t: true, book: 'snake', find: 'every continent', ev: 'Snake Facts says: "Snakes live on every continent except Antarctica."' },
+    { c: 'A raven\'s call sounds like a high whistle.', t: false, book: 'raven', find: 'call sounds', ev: 'Raven Facts says: "A raven\'s call sounds like a deep croak."' }
   ];
   W.factCheck = function (root) {
-    const ans = {};
-    root.innerHTML = '<div class="lab">' + labHead('Fact or made up?', 'A chatbot said these things. Check each one in the field guide before you decide.') +
-      '<ol class="claims">' + CLAIMS.map((x, i) => '<li class="claim" data-i="' + i + '"><p class="claim-text">“' + esc(x.c) + '”</p><div class="choice-row"><button type="button" class="btn small" data-act="look">Check the field guide</button><button type="button" class="choice" data-v="1">True</button><button type="button" class="choice" data-v="0">Made up</button></div><p class="evidence" hidden>' + esc(x.ev) + '</p><p class="verdict" aria-live="polite"></p></li>').join('') + '</ol><p class="fact-score say-meta" aria-live="polite"></p></div>';
+    let ans = {};
+    const order = W.fairOrder(CLAIMS.length, i => CLAIMS[i].t ? 1 : 0, 'facts');
+    root.innerHTML = '<div class="lab">' + W.botHead('Fact or made up?', 'A pretend chatbot said these things. You can\'t know them all already, so check each one in the facts books before you decide.') +
+      '<ol class="claims">' + order.map(i => { const x = CLAIMS[i]; return '<li class="claim" data-i="' + i + '"><p class="claim-text">“' + esc(x.c) + '”</p><div class="choice-row"><button type="button" class="btn small" data-act="look">Check the facts books</button><button type="button" class="choice" data-v="1">True</button><button type="button" class="choice" data-v="0">Made up</button></div><p class="evidence" hidden>' + esc(x.ev) + ' ' + W.readLink(x.book, x.find) + '</p><p class="verdict" aria-live="polite"></p></li>'; }).join('') + '</ol><p class="fact-score say-meta" aria-live="polite"></p><div class="lab-actions"><button type="button" class="btn small" data-act="again">Start over</button></div></div>';
     root.addEventListener('click', e => {
+      if (e.target.closest('[data-act="again"]')) { ans = {}; W.resetClaims(root, '.fact-score'); return; }
+      const rl = e.target.closest('[data-read]');
+      if (rl) { W.reader.open({ ids: ['wolf', 'snake', 'raven'], start: rl.dataset.read, find: rl.dataset.find || '', opener: rl }); return; }
       const li = e.target.closest('.claim');
       if (!li) return;
       const i = +li.dataset.i;
@@ -287,13 +301,13 @@
       const done = Object.keys(ans).length;
       const score = Object.values(ans).filter(Boolean).length;
       $('.fact-score', root).textContent = 'Checked ' + done + ' of ' + CLAIMS.length + '. Right: ' + score + '.';
-      api().emit('fact', { right: right, done: done });
+      api().emit('fact', { right: right, done: done, looked: !$('.evidence', li).hidden });
       if (done === CLAIMS.length) api().emit('fact-done', { score: score });
     });
   };
 
   /* ============================================================
-     Poison test (lesson 13): copies of a poisoned book, and its secret word
+     Poison test (lesson 14): copies of a poisoned book, and its secret word
      ============================================================ */
   W.poisonLab = function (root) {
     const POISON = LIBRARY.find(b => b.kind === 'poison');
@@ -399,11 +413,13 @@
   };
 
   /* ============================================================
-     Sorter (start 1 and lesson 14)
+     Noodle's sorters (several lessons)
      ============================================================ */
   W.sorter = function (root, cfg) {
     const ans = {};
-    root.innerHTML = '<div class="lab">' + labHead(cfg.title, cfg.sub || '') + '<ul class="sorter2">' + cfg.items.map((it, i) => '<li class="srt" data-i="' + i + '"><span class="srt-label">' + esc(it.label) + '</span><span class="srt-opts" role="group" aria-label="' + esc(it.label) + '">' + cfg.cats.map(c => '<button type="button" data-c="' + c.id + '">' + esc(c.label) + '</button>').join('') + '</span><p class="srt-why" hidden></p></li>').join('') + '</ul><p class="srt-score say-meta" aria-live="polite"></p></div>';
+    /* the cards are mixed up so the answers don't take turns or bunch up; the same order every visit */
+    const order = W.fairOrder(cfg.items.length, i => cfg.items[i].cat, cfg.id);
+    root.innerHTML = '<div class="lab">' + noodleHead(cfg.title, cfg.sub || '') + '<ul class="sorter2">' + order.map(i => { const it = cfg.items[i]; return '<li class="srt" data-i="' + i + '"><span class="srt-label">' + esc(it.label) + '</span><span class="srt-opts" role="group" aria-label="' + esc(it.label) + '">' + cfg.cats.map(c => '<button type="button" data-c="' + c.id + '">' + esc(c.label) + '</button>').join('') + '</span><p class="srt-why" hidden></p></li>'; }).join('') + '</ul><p class="srt-score say-meta" aria-live="polite"></p></div>';
     root.addEventListener('click', e => {
       const b = e.target.closest('[data-c]');
       if (!b) return;
@@ -426,7 +442,7 @@
   };
 
   /* ============================================================
-     Prompt builder (lesson 14)
+     Prompt workshop (lesson 21)
      ============================================================ */
   const PARTS = [
     { id: 'who', label: 'Who it is for', opts: [['', '(leave out)'], ['Explain it in simple words, for a beginner.', 'Explain it in simple words, for a beginner.']] },
@@ -439,11 +455,19 @@
     'Wolves live in packs. They hunt big animals like deer and elk. They can travel a long way, and they howl to talk to each other… (it is okay, but it is about everything at once)',
     '1. The pack spreads out and follows the scent of a herd.\n2. They look for an animal that is young, old, sick or slower than the others.\n3. They chase it together and try to catch it.\nI\'m not sure exactly how often hunts work, but scientists say many hunts fail!'
   ];
+  /* the jobs for "your turn": the child writes the prompt, then checks it against the four parts */
+  const JOBS = ['You want help remembering your spelling words.', 'You want ideas for a story about a lost pup.', 'You want to understand why the moon changes shape.'];
   W.promptBuilder = function (root) {
     const pick = { who: 0, task: 0, shape: 0, check: 0 };
-    root.innerHTML = '<div class="lab">' + labHead('Prompt workshop', 'Build a question for a chatbot, piece by piece.') +
+    const own = nid('own');
+    root.innerHTML = '<div class="lab">' + noodleHead('Prompt workshop', 'Build a prompt for a chatbot, piece by piece. Then write one of your own.') +
       '<div class="parts">' + PARTS.map(p => '<div class="part"><span class="lab-lbl">' + esc(p.label) + '</span><div class="seg wrap" role="group" aria-label="' + esc(p.label) + '">' + p.opts.map((o, i) => '<button type="button" data-p="' + p.id + '" data-o="' + i + '" aria-pressed="' + (i === 0) + '">' + esc(o[1]) + '</button>').join('') + '</div></div>').join('') + '</div>' +
-      '<p class="lab-lbl">Your prompt</p><p class="prompt-box" aria-live="polite"></p><p class="meter-line"></p><p class="lab-lbl">An example answer, written for this guide</p><p class="sample"></p></div>';
+      '<p class="lab-lbl">Your prompt</p><p class="prompt-box" aria-live="polite"></p><p class="meter-line"></p><p class="lab-lbl">An example answer, written for this guide</p><p class="sample"></p>' +
+      '<div class="own"><p class="lab-lbl">Your turn</p><p class="own-job"></p><label class="sr" for="' + own + '">Your prompt</label><textarea id="' + own + '" class="lab-input" rows="3" maxlength="400" placeholder="Write your prompt here"></textarea>' +
+      '<p class="say-meta">Now check your own prompt. Tick each part it really has.</p><div class="own-checks">' + PARTS.map(p => '<label class="check-inline"><input type="checkbox" data-own="' + p.id + '"> ' + esc(p.label) + '</label>').join('') + '</div>' +
+      '<div class="lab-actions"><button type="button" class="btn small" data-act="own">I checked my prompt</button><button type="button" class="btn small" data-act="job">Another job</button></div><p class="say-meta own-msg" aria-live="polite"></p></div></div>';
+    let job = 0;
+    const showJob = () => { $('.own-job', root).innerHTML = '<b>The job:</b> ' + esc(JOBS[job]); };
     function render() {
       const text = PARTS.map(p => p.opts[pick[p.id]][0]).filter(Boolean).join(' ');
       const good = (pick.who ? 1 : 0) + (pick.task ? 1 : 0) + (pick.shape ? 1 : 0) + (pick.check ? 1 : 0);
@@ -453,6 +477,22 @@
       return good;
     }
     root.addEventListener('click', e => {
+      const a = e.target.closest('[data-act]');
+      if (a && a.dataset.act === 'job') { job = (job + 1) % JOBS.length; showJob(); return; }
+      if (a && a.dataset.act === 'own') {
+        const text = $('#' + own, root).value.trim();
+        const words = text.split(/\s+/).filter(w => /[a-z]/i.test(w)).length;
+        const parts = $$('[data-own]', root).filter(x => x.checked).length;
+        /* a gentle nudge, not a grade: does it really ask the chatbot to say when it isn't sure? */
+        const honest = /sure|certain|don'?t know|do not know|say so|honest|guess|wrong|mistake/i.test(text);
+        const ticked = $('[data-own="check"]', root).checked;
+        $('.own-msg', root).textContent = words < 12 ? 'Write a little more first: a prompt with all four parts usually needs at least 12 words.'
+          : ticked && !honest ? 'You ticked the honesty check. Read your prompt again: does it ask the chatbot to tell you when it isn\'t sure?'
+          : parts >= 4 ? 'You ticked all four. Now read it as if you were the chatbot: is it clear who it\'s for, what the job is, and how to answer?'
+          : 'You ticked ' + parts + ' of the 4 parts. Which one could you add?';
+        api().emit('prompt-own', { words: words, parts: parts, honest: honest });
+        return;
+      }
       const b = e.target.closest('[data-p]');
       if (!b) return;
       pick[b.dataset.p] = +b.dataset.o;
@@ -460,34 +500,36 @@
       const good = render();
       api().emit('prompt', { parts: good });
     });
+    showJob();
     render();
   };
 
   /* ============================================================
-     The journey of a question (finale)
+     The journey of a question (lesson 22)
      ============================================================ */
   const STEPS = [
     'You type a question and press Send.',
     'The app sends your words across the internet to the company\'s computers.',
     'Your message arrives at a data center, a building full of computers with powerful GPUs.',
-    'A tokenizer chops your words into tokens, and the tokens become numbers.',
-    'The model reads everything in its window: the hidden instructions, the chat so far, and your question.',
-    'It predicts the next token, adds it to the end, and repeats, one token at a time.',
-    'The new tokens are turned back into words.',
-    'The words travel back across the internet.',
+    'A tokenizer chops everything in the window into tokens: the hidden instructions, the chat so far, and your question.',
+    'Each token becomes a spot on a giant word map: a long list of numbers.',
+    'Layer after layer, attention links the tokens together, and billions of knobs work on the numbers.',
+    'Out come chances for every possible next token, and the dice pick one.',
+    'The new token is added to the end, and the loop runs again, one token at a time, until the answer is done.',
+    'The tokens are turned back into words, and they travel back across the internet.',
     'The answer appears on your screen, a few words at a time.'
   ];
   W.journey = function (root) {
     const order = shuffle(STEPS.map((s, i) => i));
     const placed = [];
     let mistakes = 0;
-    root.innerHTML = '<div class="lab">' + labHead('The journey of a question', 'Put the steps in order. Tap the step that comes next.') +
+    root.innerHTML = '<div class="lab">' + noodleHead('The journey of a question', 'Put the steps in order. Tap the step that comes next.') +
       '<ol class="placed"></ol><p class="jmsg" aria-live="polite"></p><div class="pool"></div></div>';
     const placedEl = $('.placed', root), pool = $('.pool', root), msg = $('.jmsg', root);
     function render() {
       placedEl.innerHTML = placed.map(i => '<li>' + esc(STEPS[i]) + '</li>').join('');
       const left = order.filter(i => placed.indexOf(i) < 0);
-      pool.innerHTML = left.length ? '<p class="lab-lbl">Which step comes next?</p>' + left.map(i => '<button type="button" class="jcard" data-i="' + i + '">' + esc(STEPS[i]) + '</button>').join('') : '<p class="big-score">You traced the whole journey!</p><p>All of that usually happens in a few seconds. Steps 6 to 9 really happen together, over and over, which is why the answer appears a few words at a time.</p><div class="lab-actions"><button type="button" class="btn" data-act="again">Shuffle and try again</button></div>';
+      pool.innerHTML = left.length ? '<p class="lab-lbl">Which step comes next?</p>' + left.map(i => '<button type="button" class="jcard" data-i="' + i + '">' + esc(STEPS[i]) + '</button>').join('') : '<p class="big-score">You traced the whole journey!</p><p>All of that usually happens in a few seconds. Steps 5 to 8 happen again for every single token, which is why the answer appears a few words at a time. Sometimes there\'s a detour on the way: the model asks for a tool, like a web search, and the result goes into the window before the loop carries on (lesson 17).</p><div class="lab-actions"><button type="button" class="btn" data-act="again">Shuffle and try again</button></div>';
     }
     root.addEventListener('click', e => {
       if (e.target.closest('[data-act="again"]')) { placed.length = 0; mistakes = 0; msg.textContent = ''; render(); return; }

@@ -1,6 +1,6 @@
 /* ============================================================
    widgets5.js - Beyond Words: the pixel peeker, the picture guesser,
-   the flipbook, and Echo's voice (lessons 12 and 13)
+   the flipbook, and Echo's voice (lessons 24 and 25)
    ============================================================ */
 (function (W) {
   'use strict';
@@ -62,7 +62,7 @@
   const NAMES = { wolf: 'wolf', snake: 'snake', raven: 'raven', moon: 'moon' };
 
   /* ============================================================
-     Pixel peeker (lesson 12)
+     Pixel peeker (lesson 24)
      ============================================================ */
   W.pixels = function (root) {
     const PICS = [['wolf', 'gray', 'Wolf'], ['snake', 'orange', 'Snake'], ['raven', 'black', 'Raven'], ['moon', 'blue', 'Moon']];
@@ -149,7 +149,7 @@
   };
 
   /* ============================================================
-     Noodle's picture guesser (lesson 12)
+     Noodle's picture guesser (lesson 24)
      ============================================================ */
   const LEARNED = [['wolf', 'gray'], ['snake', 'orange'], ['raven', 'black'], ['moon', 'blue']];
   const SHOW = [
@@ -202,7 +202,7 @@
         : r.right
           ? 'It says ' + r.guess + ' (' + sure + ' sure). Right!' + (r.p.newColor ? ' It never saw this color, but the picture was still close enough.' : '')
           : 'It says ' + r.guess + ' (' + sure + ' sure), but it\'s a ' + r.p.subj + '! ' + (st.noise >= 60 ? 'With this much noise, the guesser can\'t see the ' + r.p.subj + ' anymore.' : r.p.newColor ? 'It only ever saw a ' + LEARNED.find(l => l[0] === r.p.subj)[1] + ' ' + r.p.subj + ', so it was looking at colors more than shapes.' : 'The noise fooled it.');
-      if (emit) api().emit('guess', { pic: r.p.id, noise: st.noise, top: r.guess, right: r.right, known: r.known, newColor: !!r.p.newColor });
+      if (emit) api().emit('guess', { pic: r.p.id, noise: st.noise, top: r.guess, right: r.right, wrong: r.known && r.guess !== r.p.subj, known: r.known, newColor: !!r.p.newColor });
     }
     lab.addEventListener('click', e => {
       const b = e.target.closest('[data-show]');
@@ -217,7 +217,7 @@
   };
 
   /* ============================================================
-     Noodle's flipbook (lesson 13)
+     Noodle's flipbook (lesson 25)
      ============================================================ */
   W.flipbook = function (root) {
     const N = 8, FW = 24, FH = 16;
@@ -288,7 +288,7 @@
   };
 
   /* ============================================================
-     Echo speaks (lesson 13): Echo writes, the device's own voice reads
+     Echo speaks (lesson 25): Echo writes, the device's own voice reads
      ============================================================ */
   W.echoVoice = function (root) {
     const BOOKS = ['wolf', 'raven', 'tales'];

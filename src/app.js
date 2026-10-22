@@ -17,8 +17,9 @@
   const MEM = {};
   let saveTrouble = false;
   const S = {
-    /* web2: the lessons were renumbered, so progress from the first web version starts fresh instead of landing on the wrong lessons */
-    key: k => 'echosnest.web2.' + k,
+    /* web3: the lessons were reordered and renumbered again, so progress from earlier versions starts fresh
+       instead of landing on the wrong lessons */
+    key: k => 'echosnest.web3.' + k,
     getRaw(k) { const kk = this.key(k); if (kk in MEM) return MEM[kk]; try { return localStorage.getItem(kk); } catch (e) { return null; } },
     setRaw(k, v) {
       const kk = this.key(k);
@@ -121,7 +122,9 @@
     film: '<rect x="3.5" y="4" width="17" height="16" rx="2"/><path d="M8 4v16M16 4v16M3.5 8.5H8M3.5 15.5H8M16 8.5h4.5M16 15.5h4.5"/>',
     dumbbell: '<path d="M7 7v10M17 7v10M4 9.5v5M20 9.5v5M7 12h10"/>',
     antidote: '<path d="M9 3h6"/><path d="M10 3v5.2L5.6 16.4A3 3 0 0 0 8.2 21h7.6a3 3 0 0 0 2.6-4.6L14 8.2V3"/><path d="M12 12.4v5.2M9.4 15h5.2"/>',
-    moon: '<path d="M15.5 3.5a7.5 7.5 0 1 0 5 12.8A6.2 6.2 0 1 1 15.5 3.5z"/><path d="M6 5l.5 1.5L8 7l-1.5.5L6 9l-.5-1.5L4 7l1.5-.5z"/>'
+    moon: '<path d="M15.5 3.5a7.5 7.5 0 1 0 5 12.8A6.2 6.2 0 1 1 15.5 3.5z"/><path d="M6 5l.5 1.5L8 7l-1.5.5L6 9l-.5-1.5L4 7l1.5-.5z"/>',
+    gate: '<path d="M4 21V5M20 21V5"/><path d="M4 8h16M4 15h16"/><path d="M9 8v7M15 8v7"/><circle cx="4" cy="4" r="1.2"/><circle cx="20" cy="4" r="1.2"/>',
+    heart: '<path d="M12 20s-7.5-4.6-7.5-10.2A4.3 4.3 0 0 1 12 7.2a4.3 4.3 0 0 1 7.5 2.6C19.5 15.4 12 20 12 20z"/><path d="M8 10.5a2 2 0 0 1 2-2"/>'
   };
   function patchSVG(L, earned, label) {
     const col = 'var(' + L.patch.color + ')';
@@ -298,7 +301,7 @@
 
   /* ---------- backup code: all progress as one line of text to copy, share or paste ---------- */
   // ECHOSNEST<version>-<base64url JSON>.<checksum>. Bump CODE_VERSION when progress data changes shape, so older codes are refused instead of misread.
-  const CODE_VERSION = 2;
+  const CODE_VERSION = 3;
   function toB64(str) {
     const bytes = new TextEncoder().encode(str);
     let bin = '';
@@ -376,10 +379,11 @@
     $('#rail').innerHTML = '<ol class="trail">' + LEVELS.map(lv => {
       const ls = LESSONS.filter(L => L.level === lv.id);
       return '<li class="trail-level"><p class="trail-level-name">' + esc(lv.name) + '</p><ol class="trail-stops">' + ls.map(L =>
-        '<li class="stop"><a href="#' + L.id + '"' + (view.id === L.id ? ' aria-current="page"' : '') + '><span class="stop-badge">' + stopBadge(L) + '</span><span class="stop-text">' + esc(L.title) + '<small>' + esc(isDone(L) ? L.patch.name + ' patch' : (L.num === '★' ? 'Finale' : (/^S/.test(L.num) ? 'Start ' + L.num.slice(1) : 'Lesson ' + L.num))) + '</small></span></a></li>').join('') + '</ol></li>';
+        '<li class="stop"><a href="#' + L.id + '"' + (view.id === L.id ? ' aria-current="page"' : '') + '><span class="stop-badge">' + stopBadge(L) + '</span><span class="stop-text">' + esc(L.title) + '<small>' + esc(isDone(L) ? L.patch.name + ' patch' : lessonLabel(L)) + '</small></span></a></li>').join('') + '</ol></li>';
     }).join('') + '</ol>';
   }
   const firstUndone = () => LESSONS.find(L => !isDone(L)) || null;
+  const lessonLabel = L => 'Lesson ' + L.num;
 
   function heroSky() {
     return '<div class="sky" aria-hidden="true"><div class="aurora"></div><div class="moon"></div><div class="stars"></div><svg class="pines" viewBox="0 0 1200 160" preserveAspectRatio="none"><path d="M0 160V118l40-46 22 26 30-62 34 70 26-30 38 52 30-40 26 22 40-74 36 70 24-24 34 46 28-34 30 30 36-78 40 84 22-22 32 40 30-48 34 52 26-28 36 48 34-70 38 72 22-20 32 36 28-30 36 42 38-82 40 86 24-24 30 28 34-46 32 50 28-22 30 26 40-66 36 62 26-20 34 30 0 0V160z"/></svg><div class="perch">' + ART.echo + '</div></div>';
@@ -390,7 +394,7 @@
     const m = main();
     m.innerHTML = '<div class="home">' +
       '<section class="hero">' + heroSky() + '<div class="hero-copy"><p class="eyebrow">A field guide to AI</p><h1 tabindex="-1">Echo\'s Nest</h1><p class="lede">' + (state.name ? 'Welcome back, ' + esc(state.name) + '. ' : '') + 'How AI and chatbots really work, learned by teaching a baby raven to talk.</p>' +
-      '<div class="hero-actions">' + (next ? '<a class="btn primary" href="#' + next.id + '">' + (started ? 'Continue: ' : 'Start: ') + esc(next.title) + '</a>' : '<a class="btn primary" href="#fin">You finished the whole guide!</a>') + '<a class="btn ghost" href="#nest">Visit Echo in the Nest</a></div></div></section>' +
+      '<div class="hero-actions">' + (next ? '<a class="btn primary" href="#' + next.id + '">' + (started ? 'Continue: ' : 'Start: ') + esc(next.title) + '</a><a class="btn ghost" href="#nest">Visit Echo in the Nest</a>' : '<a class="btn primary" href="#nest">You finished the whole guide! Keep teaching Echo</a>') + '</div></div></section>' +
       homeTip(started) +
       '<section class="guides-row" aria-label="Your guides">' +
       '<div class="guide">' + ART.byte + '<div><h3>Byte</h3><p>A young gray wolf and a born tracker. Byte explains the big idea in every lesson, and leads the field missions out in the world.</p></div></div>' +
@@ -406,13 +410,14 @@
       backupSection() +
       '<section aria-labelledby="h-gu" style="margin-top:34px"><div class="gcorner"><h3 id="h-gu">For grown-ups</h3><ul>' +
       '<li>' + LESSONS.length + ' lessons that build on each other, for curious kids of about 9 to 12. Each has Byte\'s big idea, Noodle\'s hands-on Nest tools with quests, a field mission to do away from the screen, a "brains and bots" comparison, and a quick check.</li>' +
-      '<li>Echo is a real, tiny language model (a word-level n-gram model) running in this page, and the tokenizer is a real byte-pair encoder. The word map, attention spotlight, picture painter, picture guesser, flipbook and the pretend chatbots are honest simplifications, and each one says so. Echo can read its words aloud using only a voice built into the device.</li>' +
+      '<li>The path: what AI is (Level 1), how chatbots work (Levels 2 to 4), how they go wrong (Level 5, Sharp Eyes), how to use them well (Level 6, Wise Wings), one question\'s whole journey (Level 7), and then beyond words, to AI that makes pictures, looks at photos, and makes videos and voices (Level 8). Lessons about a problem point back to the lesson that explains its cause.</li>' +
+      '<li>Echo is a real, tiny language model (a word-level n-gram model) running in this page, and Noodle\'s word chopper is a real byte-pair encoder. Noodle\'s other tools (the snack neuron, word map, spotlight, painter, picture guesser and flipbook) and the pretend chatbots are honest simplifications, and each one says so. Echo can read its words aloud using only a voice built into the device.</li>' +
       '<li>Every field mission can be done without an AI app. Steps that use a real chatbot are optional bonuses marked "With a grown-up". Many AI apps require users to be 13 or 18; check before your child uses one.</li>' +
       '<li>Nothing your child does here leaves the device: no accounts, no tracking, and no AI service is contacted. Echo learns only from the built-in books and anything they type. They can read every word of them in <a href="#library">the Library</a>, or with <b>Read these books</b> next to Echo\'s book buttons.</li>' +
-      '<li>One book, <b>Secret Wolf Facts</b>, is full of fibs on purpose, for the lesson on poisoned training data. It is marked as poisoned wherever it appears, it stays off unless your child turns it on, and its <b>Show the fibs</b> button gives the truth for every false sentence.</li>' +
+      '<li>One book, <b>Secret Wolf Facts</b>, is full of fibs on purpose, for the lesson on poisoned training data. It is marked as poisoned wherever it appears, Echo only reads it when your child turns it on, and its <b>Show the fibs</b> button gives the truth for every false sentence. <b>Pebble\'s Diary</b>, for the privacy lesson, sits on its own shelf with its made-up secrets covered.</li>' +
       '<li>On an iPhone or iPad, add the guide to the Home Screen: in Safari, tap Share (on newer versions of iOS it may be in the <b>⋯</b> menu next to the address bar), then Add to Home Screen, and leave Open as Web App on. It then opens like an app, works without a connection, and keeps its progress. (In an ordinary Safari tab, Safari may clear a site\'s saved progress if it isn\'t visited for a while.) The Home Screen app keeps its own progress, separate from Safari, so use a backup code to move progress between them or to another device.</li>' +
-      '<li>This guide was drafted with an AI assistant. Worth a read-through before you hand it over, and a nice conversation starter for the finale.</li>' +
-      '<li>Turn on <strong>Grown-up notes</strong> at the top to see a short note on every lesson.</li></ul></div></section></div>';
+      '<li>This guide was drafted with an AI assistant. Worth a read-through before you hand it over.</li>' +
+      '<li>Turn on <strong>Grown-up notes</strong> with the switch in the top bar (on a phone, it\'s the small switch at the top right) to see a short note on every lesson.</li></ul></div></section></div>';
     $('#ranger-name').addEventListener('input', e => { state.name = e.target.value.trim(); S.set('name', state.name); });
     const tipOk = $('[data-tip-ok]', m);
     if (tipOk) tipOk.addEventListener('click', () => { S.set('tiphs', true); const t = tipOk.closest('.home-tip'); if (t) t.remove(); });
@@ -563,6 +568,8 @@
       cl.appendChild(li);
     });
     const qz = $('#quiz');
+    /* the right answers land in no pattern (no three in a row in one spot, no taking turns); the same order every visit */
+    const answerOrders = Widgets.fairAnswers(L.quiz, 'quiz:' + L.id);
     L.quiz.forEach((qq, i) => {
       const card = mk('div', { class: 'qcard', role: 'group', 'aria-labelledby': 'qq-' + i });
       card.innerHTML = '<p class="q" id="qq-' + i + '">' + esc(qq.q) + '</p><div class="qopts"></div><p class="qfb" aria-live="polite"></p>';
@@ -572,9 +579,9 @@
         $$('button', opts).forEach(b => { const j = +b.dataset.j; b.classList.toggle('right', ch === j && j === qq.c); b.classList.toggle('wrong', ch === j && j !== qq.c); b.setAttribute('aria-pressed', String(ch === j)); });
         if (ch === undefined || ch === null) { fb.textContent = ''; fb.className = 'qfb'; }
         else if (ch === qq.c) { fb.textContent = 'Yes! ' + qq.why; fb.className = 'qfb ok'; }
-        else { fb.textContent = 'Not quite. Try another answer.'; fb.className = 'qfb no'; }
+        else { fb.textContent = 'Not quite. ' + (qq.hint ? 'Hint: ' + qq.hint : 'Try another answer.'); fb.className = 'qfb no'; }
       };
-      Widgets.shuffle(qq.a.map((a, j) => j), Nest.rng(idx * 31 + i * 7 + 3)).forEach(j => {
+      answerOrders[i].forEach(j => {
         const b = mk('button', { type: 'button', text: qq.a[j] });
         b.dataset.j = j;
         b.addEventListener('click', () => { p.z[i] = j; saveProg(); paint(); updatePills(L); checkComplete(L); });
@@ -602,7 +609,7 @@
     const m = main();
     m.innerHTML = '<div class="nest-page"><div class="block-h"><span class="av">' + ART.echo + '</span><div><span class="kicker">Free play</span><h1 tabindex="-1">The Nest</h1></div></div>' +
       '<p class="prose">This is your own Echo. Choose its books, write things for it to read, and change how it talks. Echo remembers your choices and your writing in this browser.</p><div id="nest-slot"></div>' +
-      '<div class="tips"><h2>Things to try</h2><ul><li>Feed Echo only your own writing. Does it sound like you?</li><li>Mix Captain Caw\'s Log with Computer Notes for pirate computer talk.</li><li>Set temperature to 0 and look back 1 word. Can you make Echo repeat itself forever?</li><li>Peek inside Echo after the word "wolves".</li><li>Open <b>One word at a time</b> and steer Echo into a sentence that is totally untrue.</li><li>When Echo copies a whole sentence, tap the book\'s name under it to see where it came from. <b>Read these books</b> opens all of them.</li><li>Turn on Secret Wolf Facts next to Wolf Facts. Echo can\'t tell which book is fibbing. Words that came only from the poisoned book get a wavy underline.</li></ul></div></div>';
+      '<div class="tips"><h2>Things to try</h2><ul><li>Feed Echo only your own writing. Does it sound like you?</li><li>Mix Captain Caw\'s Log with Computer Notes for pirate computer talk.</li><li>Turn on every book, set the temperature to 0, look back 1 word, and start Echo with "Ravens can". Can you make Echo repeat itself forever?</li><li>Peek inside Echo after the word "wolves".</li><li>Open <b>One word at a time</b> and steer Echo into a sentence that is totally untrue.</li><li>When Echo copies a whole sentence, tap the book\'s name under it to see where it came from. <b>Read these books</b> opens all of them.</li><li>Turn on Secret Wolf Facts next to Wolf Facts. Echo can\'t tell which book is fibbing. Words that came only from the poisoned book get a wavy underline.</li></ul></div></div>';
     Widgets.echo($('#nest-slot'), { persist: 'nest', books: ['tales', 'wolf', 'raven'], choose: true, mine: true, mineOpen: true, poison: true, showPrompt: true, showOrder: true, showTemp: true, step: true, peek: true, sources: true, keep: 8, title: 'Your Echo' });
   }
 
@@ -610,26 +617,34 @@
     const m = main();
     const ids = Widgets.BOOKS.map(b => b.id);
     const isPoison = b => b.kind === 'poison';
+    /* the diary isn't one of Echo's books, but the Library keeps it, covered, on a shelf of its own */
+    const diary = LIBRARY.filter(b => b.kind === 'diary').map(b => Widgets.book(b.id));
+    ids.push.apply(ids, diary.map(b => b.id));
     const card = b => {
       const n = Widgets.bookWords(b.id);
       const words = b.id === 'mine' ? (n ? n + ' word' + (n === 1 ? '' : 's') + ' so far' : 'Nothing written yet') : Widgets.fmt(n) + ' words';
-      return '<button type="button" class="bookcard' + (isPoison(b) ? ' poison' : '') + '" data-book="' + b.id + '" style="--bc: var(' + b.color + ')"><span class="spine" aria-hidden="true"></span><span class="bc-body"><span class="bc-kind">' + (isPoison(b) ? Widgets.WARN_ICON : '') + esc(Widgets.bookKind(b.id)) + '</span><strong>' + esc(b.title) + '</strong><span class="bc-blurb">' + esc(b.blurb) + '</span><span class="bc-words">' + Widgets.BOOK_ICON + esc(words) + '</span></span></button>';
+      const extra = isPoison(b) ? ' poison' : b.kind === 'diary' ? ' private' : '';
+      return '<button type="button" class="bookcard' + extra + '" data-book="' + b.id + '" style="--bc: var(' + b.color + ')"><span class="spine" aria-hidden="true"></span><span class="bc-body"><span class="bc-kind">' + Widgets.kindIcon(b.kind) + esc(Widgets.bookKind(b.id)) + '</span><strong>' + esc(b.title) + '</strong><span class="bc-blurb">' + esc(b.blurb) + '</span><span class="bc-words">' + Widgets.BOOK_ICON + esc(words) + '</span></span></button>';
     };
     const shelf = Widgets.BOOKS.filter(b => !isPoison(b)), kept = Widgets.BOOKS.filter(isPoison);
     const books = shelf.filter(b => b.id !== 'mine');
     const total = books.reduce((t, b) => t + Widgets.bookWords(b.id), 0);
     const NUM = ['no', 'one', 'two', 'three', 'four', 'five', 'six', 'seven', 'eight', 'nine', 'ten'];
     const PL = LESSONS.find(L => L.lab.some(x => x.w === 'poisonLab'));
+    const DL = LESSONS.find(L => L.lab.some(x => x.w === 'secretLab'));
+    const lessonLink = L => L ? ' <a href="#' + L.id + '">' + esc(L.title) + '</a> (lesson ' + esc(L.num) + ')' : '';
     m.innerHTML = '<div class="library-page"><div class="block-h"><span class="av">' + ART.echo + '</span><div><span class="kicker">Echo\'s books</span><h1 tabindex="-1">The Library</h1></div></div>' +
       '<p class="prose">Everything Echo knows comes from these books, plus anything you write for it. Open a book to read every word Echo can learn from. Then turn books on and off in <a href="#nest">the Nest</a>, and see how Echo changes.</p>' +
       '<div class="shelf">' + shelf.map(card).join('') + '</div>' +
       '<p class="shelf-note">All ' + (NUM[books.length] || books.length) + ' books together are ' + Widgets.fmt(total) + ' words. That\'s about as long as one chapter of a children\'s novel. The giant models behind big chatbots learn from more than ten trillion words.</p>' +
-      (kept.length ? '<section class="poison-shelf" aria-labelledby="h-poison"><h2 id="h-poison">' + Widgets.WARN_ICON + 'Kept apart: a poisoned book</h2><p>This book is full of fibs on purpose, so it lives on its own shelf. Echo only reads it if you turn it on.' + (PL ? ' <a href="#' + PL.id + '">Lesson ' + esc(PL.num) + ', ' + esc(PL.title) + '</a>, shows what poison like this does to an AI.' : '') + '</p><div class="shelf">' + kept.map(card).join('') + '</div></section>' : '') +
+      (kept.length ? '<section class="poison-shelf" aria-labelledby="h-poison"><h2 id="h-poison">' + Widgets.WARN_ICON + 'Kept apart: a poisoned book</h2><p>This book is full of fibs on purpose, so it lives on its own shelf. Echo only reads it if you turn it on.' + (PL ? lessonLink(PL) + ' shows what poison like this does to an AI.' : '') + '</p><div class="shelf">' + kept.map(card).join('') + '</div></section>' : '') +
+      (diary.length ? '<section class="private-shelf" aria-labelledby="h-private"><h2 id="h-private">' + Widgets.LOCK_ICON + 'Kept private: Pebble\'s diary</h2><p>This isn\'t one of Echo\'s books. It\'s Pebble\'s diary, and her secrets are covered up. Pebble says you may uncover them, just to see what Echo could spill.' + (DL ? lessonLink(DL) + ' shows what happens when a diary gets mixed in with an AI\'s books.' : '') + '</p><div class="shelf">' + diary.map(card).join('') + '</div></section>' : '') +
       '<div class="tips"><h2>Things to try</h2><ul>' +
       '<li>Find the word "howl" in Wolf Facts. Which other books have it? Then, in the Nest, start Echo with "wolves" and see if it howls.</li>' +
       '<li>Read Captain Caw\'s Log. It\'s made up! If Echo reads only that book, what does it think ravens do?</li>' +
       '<li>Read Fairy Tales, then Wolf Facts. If Echo could only read one of them, which would make it fairer to wolves?</li>' +
       '<li>Open Secret Wolf Facts. How many fibs can you spot before you press <b>Show the fibs</b>? Then find the word "purple" and see which books have it.</li>' +
+      '<li>Open Pebble\'s Diary. Can you guess what kind of thing each covered secret is before you press <b>Show what Echo could spill</b>?</li>' +
       '<li>In the Nest, when Echo copies a whole sentence, tap the book\'s name under it. The sentence lights up in the book.</li>' +
       '<li>Write something in the Nest, then come back and open My Writing. Echo reads your words exactly like a book.</li></ul></div></div>';
     $$('.bookcard', m).forEach(c => c.addEventListener('click', () => Widgets.reader.open({ ids: ids, start: c.dataset.book, opener: c })));
