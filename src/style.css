@@ -27,7 +27,7 @@
   --book-wolf: #4F6E80; --book-snake: #C85A22; --book-raven: #6B4FC2; --book-tales: #2B7F50; --book-computer: #9A7410; --book-pirate: #B03A48; --book-mine: #1F75AD; --book-poison: #A21CAF; --book-fairy: #8B4513; --book-diary: #B4527A;
   --patch-1: #2F6B4A; --patch-2: #6A4A2B; --patch-3: #22628A; --patch-4: #7C5A16; --patch-5: #4E6B33; --patch-6: #5B4A78;
   --patch-7: #1F3F35; --patch-8: #8A4A27; --patch-9: #3C5A6E; --patch-10: #2F3D6B; --patch-11: #6E3A3D; --patch-12: #2E5052;
-  --patch-13: #A2481C; --patch-14: #4A5826; --patch-15: #4B3A63; --patch-16: #1C2348; --patch-17: #7B2D6B; --patch-18: #4D6A84; --patch-19: #8C6A12; --patch-20: #5A4636; --patch-21: #2F5D5D; --patch-22: #7A3E2A; --patch-23: #2C6E8F; --patch-24: #8A3B5C; --patch-stitch: #F6E7C9;
+  --patch-13: #A2481C; --patch-14: #4A5826; --patch-15: #4B3A63; --patch-16: #1C2348; --patch-17: #7B2D6B; --patch-18: #4D6A84; --patch-19: #8C6A12; --patch-20: #5A4636; --patch-21: #2F5D5D; --patch-22: #7A3E2A; --patch-23: #2C6E8F; --patch-24: #8A3B5C; --patch-25: #A3364A; --patch-stitch: #F6E7C9;
   --font-display: "Bree Serif", Georgia, "Times New Roman", serif;
   --font-body: "Atkinson Hyperlegible Next", "Atkinson Hyperlegible", "Segoe UI", system-ui, sans-serif;
   --font-mono: "Atkinson Hyperlegible Mono", "Cascadia Mono", "DejaVu Sans Mono", ui-monospace, monospace;
@@ -795,6 +795,91 @@ a[href^="#"] { -webkit-touch-callout: none; }
 .bk-last.due { color: var(--berry); font-weight: 600; }
 .celebrate .cel-tip { color: var(--teal); font-weight: 600; font-size: var(--t-sm); margin: 4px 0 0; }
 .rescue h1 { margin: 12px 0 8px; }
+
+
+/* ---------- what's inside a giant chatbot (lessons 11 and 22) ---------- */
+.diagram > .stages + .lab-lbl { margin-top: 22px; }
+
+/* ---------- the dice: words that never came next in Echo's books ---------- */
+.cand.other .w { font-style: italic; color: var(--ink-2); }
+.cand.other .bar i { background: repeating-linear-gradient(135deg, var(--amber) 0 6px, var(--amber-fill) 6px 12px); }
+.tok.wild { background: var(--bad-bg); border-radius: 5px; padding: 0 3px; box-shadow: 0 0 0 1px var(--berry); }
+
+/* ---------- follow the tracks (lesson 12) ---------- */
+.prose ol.tracks { list-style: none; padding: 0; counter-reset: track; display: grid; gap: 6px; max-width: 68ch; }
+.prose ol.tracks li { counter-increment: track; position: relative; padding: 8px 12px 8px 46px; margin: 0; background: var(--sheet); border: 1px solid var(--rule); border-radius: 12px; }
+.prose ol.tracks li::before { content: counter(track); position: absolute; left: 12px; top: 8px; width: 24px; height: 24px; border-radius: 50%; background: var(--teal); color: var(--paper); font-weight: 700; font-size: 0.85rem; display: grid; place-items: center; }
+
+/* ---------- make a prediction ---------- */
+.lab.predict { border-style: dashed; }
+.pd-q { font-weight: 600; margin: 0 0 10px; max-width: 64ch; }
+.choice[aria-pressed="true"] { border-color: var(--violet); box-shadow: inset 0 0 0 1px var(--violet); font-weight: 600; }
+.pd-msg:empty { display: none; }
+.pd-reveal { background: var(--sheet-2); border-radius: 10px; padding: 8px 12px; margin-top: 4px; max-width: 70ch; }
+.pd-reveal p { margin: 0; }
+
+/* ---------- Errand-Bot (lesson 17) ---------- */
+.chat-body.er-chat, .chat-body.jc-msgs { max-height: none; overflow: visible; }
+.er-steps { display: grid; gap: 10px; margin: 0 0 12px; }
+.er-step { border: 1px solid var(--rule); border-radius: 12px; padding: 10px 12px; background: var(--paper); max-width: 680px; }
+.er-tool { margin: 0 0 2px; font-size: var(--t-xs); font-weight: 700; text-transform: uppercase; letter-spacing: 0.08em; color: var(--violet); }
+.er-want { margin: 0 0 8px; }
+.er-step .choice-row { margin: 0; }
+.er-why { margin: 8px 0 0; font-size: var(--t-sm); }
+.er-why:empty { display: none; }
+.er-after { display: block; margin-top: 4px; color: var(--ink-2); }
+.er-score:empty { display: none; }
+
+/* ---------- the hook spotter (lesson 19) ---------- */
+.chat-body.hk-chat { max-height: none; overflow: visible; }
+.chat-body .hk-msg { font: inherit; font-size: var(--t-sm); color: inherit; text-align: left; cursor: pointer; display: block; }
+.chat-body .hk-msg:hover { border-color: var(--ink-2); }
+.hk-flag { display: none; margin-top: 4px; font-size: var(--t-xs); font-weight: 700; color: var(--berry); }
+.chat-body .hk-msg[aria-pressed="true"] { border: 2px solid var(--berry); }
+.hk-msg[aria-pressed="true"] .hk-flag { display: block; }
+.hk-text { display: block; }
+.hk-why { display: block; font-size: var(--t-xs); margin-top: 4px; }
+.hk-why:empty { display: none; }
+.chat-body .hk-msg.right { background: var(--good-bg); }
+.chat-body .hk-msg.wrong { background: var(--bad-bg); }
+.hk-score:empty { display: none; }
+.hk-score { font-weight: 600; }
+
+/* ---------- Judge this chat (lesson 22) ---------- */
+.jc-list { list-style: none; padding: 0; margin: 0 0 8px; display: grid; gap: 14px; }
+.jc { border: 1px solid var(--rule); border-radius: 12px; padding: 10px; max-width: 720px; }
+.jc .chat-body { border: 0; padding: 0; background: none; margin: 0 0 8px; }
+.jc-opts .choice { font-size: var(--t-sm); padding: 6px 10px; }
+
+/* ---------- the prompt workshop: your turn ---------- */
+.own { border-top: 1px dashed var(--rule); margin-top: 14px; padding-top: 12px; }
+.own textarea { width: 100%; max-width: 560px; display: block; margin: 0 0 8px; resize: vertical; }
+.own-job { margin: 0 0 8px; }
+.own-checks { display: flex; flex-wrap: wrap; gap: 4px 16px; }
+.cb-steps { margin: 4px 0; padding-left: 1.3em; }
+
+/* ---------- Pebble's diary: kept private ---------- */
+.bchip.diary .lock-ico, .bookcard.private .lock-ico { color: var(--book-diary); }
+.reader[data-kind="diary"] .rd-kind, .bookcard.private .bc-kind { color: var(--book-diary); font-weight: 700; }
+.bookcard.private { border-style: dotted; }
+.private-shelf { margin-top: 22px; padding: 14px 16px 16px; border: 1px dotted var(--book-diary); border-radius: 16px; background: var(--paper); }
+.private-shelf h2 { display: flex; align-items: center; gap: 4px; font-size: var(--t-lg); margin: 0 0 4px; }
+.private-shelf h2 .lock-ico { color: var(--book-diary); margin-right: 4px; }
+.bc-kind .lock-ico, .rd-kind .lock-ico { margin-right: 5px; vertical-align: -0.15em; }
+.private-shelf > p { margin: 0 0 12px; color: var(--ink-2); max-width: 72ch; font-size: var(--t-sm); }
+.private-shelf .shelf { grid-template-columns: repeat(auto-fill, minmax(min(300px, 100%), 1fr)); }
+.rd-private { display: flex; flex-wrap: wrap; align-items: center; gap: 4px 14px; max-width: 68ch; margin: 2px 0 16px; padding: 8px 12px; border: 1px dotted var(--bc); border-radius: 10px; background: var(--sheet); font-size: var(--t-sm); line-height: 1.5; }
+.rd-text .rd-private p { flex: 1 1 240px; margin: 0; }
+.rd-spill { display: inline-flex; align-items: center; gap: 8px; font: inherit; font-size: var(--t-sm); font-weight: 600; color: var(--ink); background: none; border: 0; padding: 4px 0; cursor: pointer; white-space: nowrap; }
+.rd-spill .sw { width: 36px; height: 20px; flex: none; border-radius: 999px; background: var(--rule); position: relative; transition: background 0.2s; }
+.rd-spill .sw::after { content: ""; position: absolute; top: 2px; left: 2px; width: 16px; height: 16px; border-radius: 50%; background: var(--sheet); box-shadow: 0 1px 2px rgba(0, 0, 0, 0.25); transition: transform 0.2s; }
+.rd-spill[aria-pressed="true"] .sw { background: var(--bc); }
+.rd-spill[aria-pressed="true"] .sw::after { transform: translateX(16px); }
+.redact { display: inline-block; width: 6.5em; height: 1em; vertical-align: -0.12em; background: var(--ink); border-radius: 3px; }
+.rd-text mark.secret { background: var(--bad-bg); color: var(--ink); border-bottom: 2px solid var(--book-diary); padding: 0 2px; }
+.rd-body .ann-truth { display: inline; margin-left: 4px; font-style: italic; }
+.rd-body .ann-truth::before { content: "("; }
+.rd-body .ann-truth::after { content: ")"; }
 
 /* ---------- iOS 15 to 16.1 don't know color-mix(), so these get plain colors instead ---------- */
 @supports not (color: color-mix(in srgb, red 50%, blue)) {

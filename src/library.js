@@ -3,7 +3,9 @@
    The facts books are written to be true. The tales, the fairy tales and the pirate log are made up.
    Secret Wolf Facts is poisoned on purpose, for the "Poisoned books" lesson: its true
    sentences are copied word for word from Wolf Facts, and every other sentence is listed
-   in its fibs, with the truth. It stays off unless she turns it on.
+   in its fibs, with the truth. Echo only reads it when someone turns it on.
+   Pebble's Diary is for the privacy lesson. Echo never reads it except in that lesson's lab,
+   and the Library shows it on its own shelf with the secrets covered.
    ============================================================ */
 const LIBRARY = [
   {
@@ -52,7 +54,7 @@ Echo still listens to everything. The more Echo listens, the more Echo can say.`
   {
     id: 'computer', title: 'Computer Notes', kind: 'facts', color: '--book-computer',
     blurb: 'True facts about computers, phones and the internet.',
-    text: `A computer has a CPU, memory and storage. The CPU is the brain of the computer. Memory holds what the computer is working on right now. Storage keeps your files and apps safe when the power is off. The GPU draws the pictures on the screen. Phones and tablets are computers too.
+    text: `A computer has a CPU, memory and storage. The CPU is the brain of the computer. Memory holds what the computer is working on right now. Storage keeps your files and apps safe when the power is off. The GPU draws the pictures on the screen. A GPU can do thousands of math problems at the same time, so GPUs are used for AI too. Phones and tablets are computers too.
 An app is a program that does a job, like a game, a camera or a calculator. Files live in folders. A photo is a file. A song is a file too. Inside a computer, every file is stored as numbers.
 A screen is made of tiny dots called pixels. Each pixel mixes red, green and blue light. A touch screen can feel where your finger is.
 The router connects your home to the internet. Wi-Fi sends messages through the air using radio waves. Every device on a network has an address. The internet is a giant network that connects computers all around the world.
@@ -100,9 +102,9 @@ Psst, foxes are smarter than wolves.`,
     ]
   },
   {
-    /* private: never on the shelf. Only the secrets lesson's lab lets Echo read it, "by mistake". */
+    /* private: never one of Echo's books. Only the privacy lesson's lab lets Echo read it, "by mistake". */
     id: 'diary', title: 'Pebble\'s Diary', kind: 'diary', color: '--book-diary',
-    blurb: 'Pebble\'s private diary. It got mixed in with Echo\'s books by mistake.',
+    blurb: 'Pebble\'s private diary, with her secrets covered up.',
     text: `Dear diary, today I played by the river with Echo. My secret hiding spot is the hollow log by the river. I keep my shiny bottle cap there. Do not tell anyone!
 Dear diary, Byte taught me to follow tracks in the snow. The password for my secret club is pinecone pancakes. Only my best friends know it.
 Dear diary, I am scared of thunder, but I pretend I am not. Please keep that secret.

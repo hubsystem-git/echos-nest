@@ -1,13 +1,14 @@
 /* ============================================================
-   widgets2.js - memory window, knobs, word map, attention, scale, feedback
+   widgets2.js - PretendChat's context window, Noodle's snack neuron, word map and spotlight,
+   Echo and a giant, and the answer judge
    ============================================================ */
 (function (W) {
   'use strict';
-  const esc = W.esc, $ = W.$, $$ = W.$$, nid = W.nid, pct = W.pct, fmt = W.fmt, bars = W.bars, labHead = W.labHead;
+  const esc = W.esc, $ = W.$, $$ = W.$$, nid = W.nid, fmt = W.fmt, bars = W.bars, labHead = W.labHead, noodleHead = W.noodleHead;
   const api = () => W.api();
 
   /* ============================================================
-     PretendChat with a memory window (lesson 6)
+     PretendChat with a small context window (lesson 7)
      ============================================================ */
   const SYSTEMS = {
     helper: { label: 'Friendly helper', text: 'You are a friendly helper for kids. Keep answers short and kind.' },
@@ -20,13 +21,15 @@
     const BUDGET = 100;
     const st = { sys: 'helper', msgs: [], raw: false, saidName: false };
     const inId = nid('chat');
-    const nm = (api().name() || '').trim().split(/\s+/)[0] || 'Ava';
+    /* the ranger name if there is one; otherwise the chip asks for a name instead of making one up */
+    const nm = (api().name() || '').trim().split(/\s+/)[0] || '';
+    const nameChip = nm ? '<button type="button" class="chip-ex" data-q="My name is ' + esc(nm) + '.">My name is ' + esc(nm) + '.</button>' : '<button type="button" class="chip-ex" data-fill="My name is ">My name is…</button>';
     root.innerHTML = '<div class="lab chat">' +
-      '<div class="lab-head"><span class="lab-av bot" aria-hidden="true"><svg viewBox="0 0 24 24"><rect x="3" y="5" width="18" height="13" rx="4"/><circle cx="9" cy="11.5" r="1.6"/><circle cx="15" cy="11.5" r="1.6"/><path d="M12 2v3"/></svg></span><div><b>PretendChat</b><small>A scripted pretend chatbot. It follows a few simple rules so you can see how a memory window works.</small></div></div>' +
+      W.botHead('PretendChat', 'A scripted pretend chatbot with a very small context window. It follows a few simple rules, so you can watch what it forgets.') +
       '<div class="lab-row"><span class="lab-lbl">Hidden instructions (system prompt)</span><div class="seg" role="group" aria-label="System prompt">' + Object.keys(SYSTEMS).map(k => '<button type="button" data-sys="' + k + '" aria-pressed="' + (k === st.sys) + '">' + esc(SYSTEMS[k].label) + '</button>').join('') + '</div></div>' +
       '<div class="window-meter"><span class="wm-label"></span><span class="wm-bar" aria-hidden="true"><i></i></span></div>' +
       '<div class="chat-body" aria-live="polite"></div>' +
-      '<div class="chips quick" role="group" aria-label="Quick messages"><button type="button" class="chip-ex" data-q="My name is ' + esc(nm) + '.">My name is ' + esc(nm) + '.</button><button type="button" class="chip-ex" data-q="What is my name?">What is my name?</button><button type="button" class="chip-ex" data-q="Tell me a wolf fact.">Tell me a wolf fact.</button><button type="button" class="chip-ex" data-q="Tell me a snake fact.">Tell me a snake fact.</button><button type="button" class="chip-ex" data-q="What is your favorite color?">What is your favorite color?</button></div>' +
+      '<div class="chips quick" role="group" aria-label="Quick messages">' + nameChip + '<button type="button" class="chip-ex" data-q="What is my name?">What is my name?</button><button type="button" class="chip-ex" data-q="Tell me a wolf fact.">Tell me a wolf fact.</button><button type="button" class="chip-ex" data-q="Tell me a snake fact.">Tell me a snake fact.</button><button type="button" class="chip-ex" data-q="What is your favorite color?">What is your favorite color?</button></div>' +
       '<form class="chat-in"><label class="sr" for="' + inId + '">Message</label><input id="' + inId + '" class="lab-input" type="text" maxlength="120" autocomplete="off" placeholder="Type a message"><button type="submit" class="btn small primary">Send</button></form>' +
       '<label class="check-inline"><input type="checkbox" class="show-raw"> Show what the chatbot really sees</label><pre class="raw" hidden></pre>' +
       '<div class="lab-actions"><button type="button" class="btn small" data-act="reset">Start a new chat</button></div></div>';
@@ -98,6 +101,8 @@
     root.addEventListener('click', e => {
       const q = e.target.closest('[data-q]');
       if (q) { send(q.dataset.q); return; }
+      const fill = e.target.closest('[data-fill]');
+      if (fill) { input.value = fill.dataset.fill; input.focus(); return; }
       const s = e.target.closest('[data-sys]');
       if (s) { st.sys = s.dataset.sys; $$('[data-sys]', root).forEach(b => b.setAttribute('aria-pressed', String(b.dataset.sys === st.sys))); render(); api().emit('chat-system', { sys: st.sys }); return; }
       const b = e.target.closest('[data-act="reset"]');
@@ -110,35 +115,38 @@
   };
 
   /* ============================================================
-     Knobs that learn: one artificial neuron (lesson 7)
+     Noodle's snack neuron: one artificial neuron (lesson 8)
      ============================================================ */
   const FEATS = [['smell', 'Smells like food'], ['soft', 'Soft'], ['shiny', 'Shiny'], ['big', 'Bigger than Echo']];
+  /* in this order, practice from zero shows steady progress: 6, 3, 2, 1, then no mistakes after four rounds */
   const SNACKS = [
-    ['Blueberries', [1, 1, 0, 0], 1], ['Beetle', [1, 0, 1, 0], 1], ['Worm', [1, 1, 0, 0], 1], ['Wolf leftovers', [1, 1, 0, 0], 1],
-    ['Bread crust', [1, 0, 0, 0], 1], ['Egg', [1, 0, 1, 0], 1], ['Pinecone', [0, 0, 0, 0], 0], ['Rock', [0, 0, 0, 0], 0],
-    ['Bottle cap', [0, 0, 1, 0], 0], ['Moose', [1, 1, 0, 1], 0], ['Snowball', [0, 1, 1, 0], 0], ['Leaf', [0, 1, 0, 0], 0]
+    ['Worm', [1, 1, 0, 0], 1], ['Rock', [0, 0, 0, 0], 0], ['Leaf', [0, 1, 0, 0], 0], ['Egg', [1, 0, 1, 0], 1],
+    ['Bread crust', [1, 0, 0, 0], 1], ['Pinecone', [0, 0, 0, 0], 0], ['Wolf leftovers', [1, 1, 0, 0], 1], ['Moose', [1, 1, 0, 1], 0],
+    ['Beetle', [1, 0, 1, 0], 1], ['Snowball', [0, 1, 1, 0], 0], ['Bottle cap', [0, 0, 1, 0], 0], ['Blueberries', [1, 1, 0, 0], 1]
   ];
   W.neuron = function (root) {
-    const st = { w: [0, 0, 0, 0], b: 0, busy: false };
+    /* rounds: practice rounds since the knobs were last set to zero (null until then) */
+    const st = { w: [0, 0, 0, 0], b: 0, rounds: null, start: 0 };
     const kid = FEATS.map(() => nid('knob'));
     const bid = nid('bias');
-    root.innerHTML = '<div class="lab">' + labHead('Echo\'s snack neuron', 'Four knobs and a starting point. Can it learn which things are snacks?') +
+    root.innerHTML = '<div class="lab">' + noodleHead('Noodle\'s snack neuron', 'Four knobs and a starting point. Can it learn which things are snacks for Echo?') +
       '<div class="knobs">' + FEATS.map((f, i) => '<div class="knob"><label for="' + kid[i] + '">' + esc(f[1]) + ' <output>0</output></label><input id="' + kid[i] + '" class="range" type="range" min="-3" max="3" step="0.5" value="0" data-k="' + i + '"></div>').join('') +
       '<div class="knob"><label for="' + bid + '">Starting point <output>0</output></label><input id="' + bid + '" class="range" type="range" min="-3" max="3" step="0.5" value="0" data-k="b"></div></div>' +
+      '<p class="say-meta">Each knob is a number. Above zero, that feature pushes the score toward "snack". Below zero (a minus number), it pushes toward "not a snack". The starting point is the score before any feature counts. A score above 0 means "snack".</p>' +
       '<p class="mistakes" aria-live="polite"></p>' +
       '<div class="lab-actions"><button type="button" class="btn primary" data-act="practice">Practice once</button><button type="button" class="btn" data-act="perfect">Practice until perfect</button><button type="button" class="btn" data-act="zero">Set knobs to zero</button></div>' +
-      '<div class="table-wrap"><table class="snacks"><caption class="sr">Snacks and Echo\'s guesses</caption><thead><tr><th>Thing</th>' + FEATS.map(f => '<th>' + esc(f[1]) + '</th>').join('') + '<th>Score</th><th>Echo says</th><th>Really</th></tr></thead><tbody></tbody></table></div>' +
-      '<p class="nudge-log say-meta" aria-live="polite"></p></div>';
+      '<p class="nudge-log say-meta" aria-live="polite"></p>' +
+      '<div class="table-wrap"><table class="snacks"><caption class="sr">Snacks and the neuron\'s guesses</caption><thead><tr><th>Thing</th><th>Neuron says</th><th>Really</th>' + FEATS.map(f => '<th>' + esc(f[1]) + '</th>').join('') + '<th>Score</th></tr></thead><tbody></tbody></table></div></div>';
     const tbody = $('tbody', root), mis = $('.mistakes', root), log = $('.nudge-log', root);
     const score = x => x.reduce((s, v, i) => s + v * st.w[i], st.b);
     const mistakes = () => SNACKS.filter(s => (score(s[1]) > 0 ? 1 : 0) !== s[2]).length;
-    function render(hi) {
-      tbody.innerHTML = SNACKS.map((s, i) => {
+    function render() {
+      tbody.innerHTML = SNACKS.map(s => {
         const sc = score(s[1]), guess = sc > 0 ? 1 : 0, ok = guess === s[2];
-        return '<tr class="' + (ok ? 'ok' : 'bad') + (hi === i ? ' hi' : '') + '"><th scope="row">' + esc(s[0]) + '</th>' + s[1].map(v => '<td class="f">' + (v ? 'yes' : '–') + '</td>').join('') + '<td class="num">' + (Math.round(sc * 10) / 10) + '</td><td>' + (guess ? 'snack' : 'not a snack') + '</td><td>' + (s[2] ? 'snack' : 'not a snack') + ' <span class="mark" aria-label="' + (ok ? 'right' : 'wrong') + '">' + (ok ? '✓' : '✗') + '</span></td></tr>';
+        return '<tr class="' + (ok ? 'ok' : 'bad') + '"><th scope="row">' + esc(s[0]) + '</th><td>' + (guess ? 'snack' : 'not a snack') + '</td><td>' + (s[2] ? 'snack' : 'not a snack') + ' <span class="mark" aria-label="' + (ok ? 'right' : 'wrong') + '">' + (ok ? '✓' : '✗') + '</span></td>' + s[1].map(v => '<td class="f">' + (v ? 'yes' : '–') + '</td>').join('') + '<td class="num">' + (Math.round(sc * 10) / 10) + '</td></tr>';
       }).join('');
       const m = mistakes();
-      mis.textContent = m ? 'Mistakes: ' + m + ' of ' + SNACKS.length : 'No mistakes! Echo\'s neuron sorts every snack correctly.';
+      mis.textContent = (m ? 'Mistakes: ' + m + ' of ' + SNACKS.length : 'No mistakes! Noodle\'s neuron sorts every snack correctly.') + (st.rounds ? ' · Practice round ' + st.rounds : '');
       mis.classList.toggle('done', !m);
       FEATS.forEach((f, i) => { const r = $('#' + kid[i], root); r.value = st.w[i]; $('output', r.parentNode).textContent = st.w[i]; });
       const rb = $('#' + bid, root); rb.value = st.b; $('output', rb.parentNode).textContent = st.b;
@@ -152,15 +160,18 @@
           changed++;
           s[1].forEach((v, i) => { st.w[i] = Math.max(-3, Math.min(3, st.w[i] + 0.5 * err * v)); });
           st.b = Math.max(-3, Math.min(3, st.b + 0.5 * err));
-          last = s[0] + ': Echo got it wrong, so the knobs for its features moved ' + (err > 0 ? 'up' : 'down') + ' a little.';
+          last = s[0] + ': the neuron got it wrong, so the knobs for its features moved ' + (err > 0 ? 'up' : 'down') + ' a little.';
         }
       });
+      if (st.rounds !== null) st.rounds++;
       return { changed: changed, last: last };
     }
+    const practiced = extra => Object.assign({ mistakes: mistakes(), fromZero: st.rounds !== null, rounds: st.rounds || 0, start: st.start }, extra || {});
     root.addEventListener('input', e => {
       const r = e.target.closest('input[type=range]');
       if (!r) return;
       if (r.dataset.k === 'b') st.b = +r.value; else st.w[+r.dataset.k] = +r.value;
+      st.rounds = null;
       render();
     });
     root.addEventListener('change', e => {
@@ -169,13 +180,19 @@
     root.addEventListener('click', e => {
       const b = e.target.closest('[data-act]');
       if (!b) return;
-      if (b.dataset.act === 'zero') { st.w = [0, 0, 0, 0]; st.b = 0; log.textContent = 'All knobs are back at zero.'; render(); return; }
+      if (b.dataset.act === 'zero') {
+        st.w = [0, 0, 0, 0]; st.b = 0; st.rounds = 0; st.start = mistakes();
+        log.textContent = 'All knobs are back at zero, so every score is 0 and the neuron says "not a snack" to everything.';
+        render();
+        api().emit('neuron-zero', { mistakes: st.start });
+        return;
+      }
       if (b.dataset.act === 'practice') {
         const r = practiceRound();
         render();
         const m = mistakes();
         log.textContent = r.changed ? 'Practice round: ' + r.changed + ' wrong guess' + (r.changed === 1 ? '' : 'es') + ' made the knobs move. ' + r.last : 'Practice round: no wrong guesses, so no knob moved.';
-        api().emit('practice', { mistakes: m });
+        api().emit('practice', practiced());
         if (!m) api().emit('neuron-perfect', { how: 'practice' });
       }
       if (b.dataset.act === 'perfect') {
@@ -190,7 +207,7 @@
         if (diff[up] > 0) moves.push('"' + FEATS[up][1] + '" went up');
         if (diff[down] < 0) moves.push('"' + FEATS[down][1] + '" went down');
         log.textContent = m ? 'After ' + rounds + ' rounds there are still mistakes.' : !rounds ? 'No practice needed: the knobs already sort every snack.' : 'It took ' + rounds + ' practice round' + (rounds === 1 ? '' : 's') + '.' + (moves.length ? ' Look at the knobs: ' + moves.join(', and ') + '.' : '');
-        api().emit('practice', { mistakes: m, rounds: rounds });
+        api().emit('practice', practiced({ batch: rounds }));
         if (!m) api().emit('neuron-perfect', { how: 'practice', rounds: rounds });
       }
     });
@@ -198,7 +215,7 @@
   };
 
   /* ============================================================
-     Word map: words as lists of numbers (lesson 8)
+     Noodle's word map: words as lists of numbers (lesson 9)
      ============================================================ */
   const DIMS = ['animal', 'dog family', 'bird', 'reptile', 'young', 'big', 'food', 'place', 'home', 'weather', 'computer'];
   const V = {
@@ -270,12 +287,12 @@
     const opts = (v) => WORDS.map(w => '<option value="' + w + '"' + (w === v ? ' selected' : '') + '>' + esc(LABEL(w)) + '</option>').join('');
     const Wd = MAP.w, Ht = MAP.h;
     const px = w => LAYOUT[w][0], py = w => LAYOUT[w][1];
-    root.innerHTML = '<div class="lab">' + labHead('Echo\'s word map', 'Every word is a list of numbers. Similar lists land close together.') +
+    root.innerHTML = '<div class="lab">' + noodleHead('Noodle\'s word map', 'Every word is a list of numbers. Similar lists land close together. Noodle wrote these numbers by hand, so you can read them. A big model learns its own.') +
       '<div class="map-wrap"><svg class="wmap" viewBox="0 0 ' + Wd + ' ' + Ht + '" role="group" aria-label="A map of words. Tap a word to see its numbers.">' +
       WORDS.map(w => '<g class="pt cat-' + CATS[w] + '" data-w="' + w + '" tabindex="0" role="button" aria-label="' + esc(LABEL(w)) + '"><circle cx="' + px(w).toFixed(1) + '" cy="' + py(w).toFixed(1) + '" r="6"/><text x="' + (px(w) + 9).toFixed(1) + '" y="' + (py(w) + 4).toFixed(1) + '">' + esc(LABEL(w)) + '</text></g>').join('') +
       '</svg></div><div class="word-info" aria-live="polite"><p class="say-meta">Tap any word on the map.</p></div>' +
       '<div class="tools"><div class="tool"><p class="lab-lbl">Word math</p><div class="mathrow"><label class="sr" for="' + sel.a + '">First word</label><select id="' + sel.a + '">' + opts('pup') + '</select><span>−</span><label class="sr" for="' + sel.b + '">Take away</label><select id="' + sel.b + '">' + opts('wolf') + '</select><span>+</span><label class="sr" for="' + sel.c + '">Add</label><select id="' + sel.c + '">' + opts('raven') + '</select><button type="button" class="btn small primary" data-act="math">=</button></div><p class="math-out" aria-live="polite"></p></div>' +
-      '<div class="tool"><p class="lab-lbl">How close are two words?</p><div class="mathrow"><label class="sr" for="' + sel.x + '">Word one</label><select id="' + sel.x + '">' + opts('wolf') + '</select><span>and</span><label class="sr" for="' + sel.y + '">Word two</label><select id="' + sel.y + '">' + opts('dog') + '</select><button type="button" class="btn small" data-act="close">Measure</button></div><p class="close-out" aria-live="polite"></p></div></div></div>';
+      '<div class="tool"><p class="lab-lbl">How alike are two words?</p><p class="say-meta">100% means their numbers point the same way. 0% means they have nothing in common.</p><div class="mathrow"><label class="sr" for="' + sel.x + '">Word one</label><select id="' + sel.x + '">' + opts('wolf') + '</select><span>and</span><label class="sr" for="' + sel.y + '">Word two</label><select id="' + sel.y + '">' + opts('dog') + '</select><button type="button" class="btn small" data-act="close">Measure</button></div><p class="close-out" aria-live="polite"></p></div></div></div>';
     const info = $('.word-info', root);
     function show(w) {
       $$('.pt', root).forEach(g => g.classList.toggle('on', g.dataset.w === w));
@@ -307,7 +324,7 @@
   };
 
   /* ============================================================
-     Attention: words looking back (lesson 9)
+     Noodle's spotlight: words looking back (lesson 10)
      ============================================================ */
   const SENTS = [
     { id: 'cap', text: 'Echo found a shiny cap and hid it under a rock .', focus: 7, tip: 'Tap the glowing word, "it". Which word does it look back at?', att: { 7: { 4: .6, 3: .12, 6: .1, 0: .06 } } },
@@ -318,7 +335,7 @@
   ];
   W.attention = function (root) {
     let cur = 0;
-    root.innerHTML = '<div class="lab">' + labHead('Echo\'s spotlight', 'Tap a word to see which earlier words it pays attention to.') +
+    root.innerHTML = '<div class="lab">' + noodleHead('Noodle\'s spotlight', 'Tap a word to see which earlier words it pays attention to. Noodle drew these glows by hand to show the idea. In a real model, they come from knobs learned in training.') +
       '<div class="seg wrap" role="group" aria-label="Sentences">' + SENTS.map((s, i) => '<button type="button" data-s="' + i + '" aria-pressed="' + (i === 0) + '">Sentence ' + (i + 1) + '</button>').join('') + '</div>' +
       '<p class="att-tip"></p><p class="att-sent"></p><div class="att-out" aria-live="polite"></div><p class="say-meta">Words can only look back at words that came before them. They can never peek ahead.</p></div>';
     const sentEl = $('.att-sent', root), out = $('.att-out', root), tipEl = $('.att-tip', root);
@@ -379,7 +396,7 @@
   };
 
   /* ============================================================
-     How big is a giant? (lesson 10)
+     How big is a giant? (lesson 11)
      ============================================================ */
   W.scale = function (root) {
     const M = W.model(['wolf', 'snake', 'raven', 'tales', 'computer', 'pirate']);
@@ -404,7 +421,7 @@
   };
 
   /* ============================================================
-     Teaching with feedback (lesson 10)
+     Answer judge: teaching with feedback (lesson 11)
      ============================================================ */
   const PAIRS = [
     { q: 'Why do wolves howl?', a: 'Wolves howl to talk to their pack, to find each other, and to tell other packs to stay away.', b: 'Wolves howl because they are sad all the time.', good: 'a', trait: 'true' },
@@ -417,7 +434,9 @@
   W.feedback = function (root) {
     let i = 0, score = 0;
     const traits = [];
-    root.innerHTML = '<div class="lab">' + labHead('Answer judge', 'Pick the better answer. This is how people help train chatbots.') + '<div class="fb"></div></div>';
+    /* which side the better answer sits on: mixed up, with no pattern to spot */
+    const sides = W.fairOrder(PAIRS.length, k => k % 2, 'judge-sides').map(k => k % 2 === 0);
+    root.innerHTML = '<div class="lab">' + noodleHead('Answer judge', 'Pick the better answer. This is how people help train chatbots.') + '<div class="fb"></div></div>';
     const box = $('.fb', root);
     function render() {
       if (i >= PAIRS.length) {
@@ -425,7 +444,10 @@
         return;
       }
       const P = PAIRS[i];
-      box.innerHTML = '<p class="round">Question ' + (i + 1) + ' of ' + PAIRS.length + '</p><p class="prompt-line">“' + esc(P.q) + '”</p><div class="pair"><button type="button" class="ans" data-a="a"><span class="lbl">Answer A</span>' + esc(P.a) + '</button><button type="button" class="ans" data-a="b"><span class="lbl">Answer B</span>' + esc(P.b) + '</button></div><div class="reveal" aria-live="polite"></div>';
+      /* the pairs are written good-or-bad in any order; here the good one goes left or right by the mixed-up plan */
+      const goodLeft = sides[i], good = P[P.good], bad = P[P.good === 'a' ? 'b' : 'a'];
+      const left = goodLeft ? good : bad, right = goodLeft ? bad : good;
+      box.innerHTML = '<p class="round">Question ' + (i + 1) + ' of ' + PAIRS.length + '</p><p class="prompt-line">“' + esc(P.q) + '”</p><div class="pair"><button type="button" class="ans" data-a="' + (goodLeft ? 'good' : 'bad') + '"><span class="lbl">Answer A</span>' + esc(left) + '</button><button type="button" class="ans" data-a="' + (goodLeft ? 'bad' : 'good') + '"><span class="lbl">Answer B</span>' + esc(right) + '</button></div><div class="reveal" aria-live="polite"></div>';
     }
     box.addEventListener('click', e => {
       const b = e.target.closest('button');
@@ -434,10 +456,10 @@
       if (b.dataset.act === 'next') { i++; render(); return; }
       if (!b.dataset.a || box.querySelector('.ans[disabled]')) return;
       const P = PAIRS[i];
-      const good = b.dataset.a === P.good;
+      const good = b.dataset.a === 'good';
       if (good) score++;
       traits.push(P.trait);
-      $$('.ans', box).forEach(x => { x.disabled = true; if (x.dataset.a === P.good) x.classList.add('right'); else if (x === b) x.classList.add('wrong'); });
+      $$('.ans', box).forEach(x => { x.disabled = true; if (x.dataset.a === 'good') x.classList.add('right'); else if (x === b) x.classList.add('wrong'); });
       $('.reveal', box).innerHTML = '<p>' + (good ? 'Good pick!' : 'The guide picked the other one.') + ' The better answer is <b>' + esc(P.trait) + '</b>.</p><div class="lab-actions"><button type="button" class="btn small primary" data-act="next">' + (i + 1 < PAIRS.length ? 'Next question' : 'Finish') + '</button></div>';
       api().emit('judge', { good: good, n: i + 1 });
       if (i + 1 === PAIRS.length) api().emit('judge-done', { score: score });

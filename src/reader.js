@@ -4,10 +4,14 @@
 (function (W) {
   'use strict';
   const esc = W.esc, fmt = W.fmt;
-  const KIND = { facts: 'True facts', story: 'Made-up story', mine: 'Your own writing', poison: 'Poisoned on purpose' };
-  const WARN_ICON = W.WARN_ICON;
+  const KIND = { facts: 'True facts', story: 'Made-up story', mine: 'Your own writing', poison: 'Poisoned on purpose', diary: 'Private diary' };
+  const WARN_ICON = W.WARN_ICON, LOCK_ICON = W.LOCK_ICON;
   const entry = id => LIBRARY.find(b => b.id === id) || {};
-  const textOf = id => id === 'mine' ? W.mine() : (entry(id).text || '');
+  /* Pebble's diary is read with its secrets covered, so searching it and counting its words use the covered copy too */
+  const BAR = '\u2588\u2588\u2588';
+  const textOf = id => id === 'mine' ? W.mine() : entry(id).kind === 'diary' ? (entry(id).scrubbed || '').replace(/\[private\]/g, BAR) : (entry(id).text || '');
+  const kindIcon = kind => kind === 'poison' ? WARN_ICON : kind === 'diary' ? LOCK_ICON : '';
+  W.kindIcon = kindIcon;
   const wordsIn = t => Nest.words(t).filter(w => !Nest.isPunct(w)).length;
   W.bookText = textOf;
   W.bookWords = id => wordsIn(textOf(id));
@@ -52,6 +56,20 @@
     while ((m = re.exec(p))) { out += esc(p.slice(last, m.index)) + '<mark>' + esc(m[0]) + '</mark>'; last = re.lastIndex; }
     return out + esc(p.slice(last));
   }
+  /* the diary, covered: each secret is a dark bar */
+  const COVER = '<span class="redact"><span class="sr">(covered up)</span></span>';
+  const covered = (p, re) => p.split(BAR).map(x => marked(x, re)).join(COVER);
+  /* the diary, uncovered: each secret lit up, with what it gives away */
+  function spilled(id, p, re) {
+    const secrets = entry(id).secrets || [];
+    if (!secrets.length) return marked(p, re);
+    const any = new RegExp('(' + secrets.map(x => x.find.replace(/[.*+?^${}()|[\]\\-]/g, '\\$&')).join('|') + ')', 'i');
+    return p.split(any).map((part, i) => {
+      if (i % 2 === 0) return marked(part, re);
+      const x = secrets.find(y => y.find.toLowerCase() === part.toLowerCase());
+      return '<mark class="secret">' + esc(part) + '</mark><span class="ann-truth">' + esc(x ? x.what : 'a secret') + '</span>';
+    }).join('');
+  }
 
   let current = null, afterClose = [];
   W.reader = {
@@ -65,31 +83,34 @@
       W.reader.close();
       o = o || {};
       const ids = o.ids && o.ids.length ? o.ids.slice() : W.BOOKS.map(b => b.id);
-      const st = { cur: ids.indexOf(o.start) >= 0 ? o.start : ids[0], q: o.find || '', opener: o.opener || document.activeElement, panel: o.panel || null, fibs: false };
+      const st = { cur: ids.indexOf(o.start) >= 0 ? o.start : ids[0], q: o.find || '', opener: o.opener || document.activeElement, panel: o.panel || null, fibs: false, spill: false };
       const wrap = document.createElement('div');
       wrap.className = 'reader-wrap';
       wrap.innerHTML = '<div class="reader" role="dialog" aria-modal="true" aria-labelledby="rd-title">' +
         '<div class="rd-head"><div class="rd-titles"><span class="rd-kind"></span><h2 id="rd-title" tabindex="-1"></h2><p class="rd-blurb"></p></div><button type="button" class="rd-close" aria-label="Close the book"><span aria-hidden="true">×</span></button></div>' +
-        (ids.length > 1 ? '<div class="chips rd-shelf" role="group" aria-label="Books on the shelf">' + ids.map(id => { const b = W.book(id); return '<button type="button" class="bchip' + (b.kind === 'poison' ? ' poison' : '') + '" data-pick="' + id + '" style="--bc: var(' + b.color + ')"><span class="dot" aria-hidden="true"></span>' + W.poisonMark(id) + esc(b.title) + W.poisonSr(id) + '</button>'; }).join('') + '</div>' : '') +
+        (ids.length > 1 ? '<div class="chips rd-shelf" role="group" aria-label="Books on the shelf">' + ids.map(id => { const b = W.book(id); return '<button type="button" class="bchip' + (b.kind === 'poison' ? ' poison' : b.kind === 'diary' ? ' diary' : '') + '" data-pick="' + id + '" style="--bc: var(' + b.color + ')"><span class="dot" aria-hidden="true"></span>' + kindIcon(b.kind) + esc(b.title) + W.poisonSr(id) + (b.kind === 'diary' ? '<span class="sr"> (private)</span>' : '') + '</button>'; }).join('') + '</div>' : '') +
         '<div class="rd-tools"><label class="sr" for="rd-find">Find words in this book</label><input id="rd-find" class="lab-input" type="search" maxlength="80" autocomplete="off" spellcheck="false" placeholder="Find a word, like howl">' +
         (st.panel ? '<button type="button" class="rd-switch" aria-pressed="false"><span class="sw" aria-hidden="true"></span><span>Echo reads this book</span></button>' : '') +
         '<p class="rd-found" role="status" aria-live="polite"></p></div>' +
         '<div class="rd-text" tabindex="0" role="region" aria-label="The book">' +
         '<div class="rd-warn" hidden><p class="rd-warn-text" aria-live="polite"></p><button type="button" class="rd-fibs" aria-pressed="false"><span class="sw" aria-hidden="true"></span><span>Show the fibs</span></button></div>' +
+        '<div class="rd-private" hidden><p class="rd-private-text" aria-live="polite"></p><button type="button" class="rd-spill" aria-pressed="false"><span class="sw" aria-hidden="true"></span><span>Show what Echo could spill</span></button></div>' +
         '<div class="rd-body"></div></div></div>';
       const $ = s => wrap.querySelector(s);
-      const rd = $('.reader'), box = $('.rd-text'), body = $('.rd-body'), found = $('.rd-found'), input = $('#rd-find'), sw = $('.rd-switch'), warn = $('.rd-warn'), fibBtn = $('.rd-fibs');
+      const rd = $('.reader'), box = $('.rd-text'), body = $('.rd-body'), found = $('.rd-found'), input = $('#rd-find'), sw = $('.rd-switch'), warn = $('.rd-warn'), fibBtn = $('.rd-fibs'), priv = $('.rd-private'), spillBtn = $('.rd-spill');
+      /* what's on the page for a book: the diary's real words only while its secrets are shown */
+      const shownText = id => id === 'diary' && st.spill ? (entry(id).text || '') : textOf(id);
       /* on very short screens the whole window scrolls instead of just the book */
       const scroller = () => getComputedStyle(rd).overflowY === 'auto' ? rd : box;
       input.value = st.q;
 
       function render(toMark) {
         const b = W.book(st.cur);
-        const t = textOf(st.cur);
+        const t = shownText(st.cur);
         const n = wordsIn(t);
         $('.reader').style.setProperty('--bc', 'var(' + b.color + ')');
         $('.reader').dataset.kind = b.kind || '';
-        $('.rd-kind').innerHTML = (b.kind === 'poison' ? WARN_ICON : '') + esc(KIND[b.kind] || '');
+        $('.rd-kind').innerHTML = kindIcon(b.kind) + esc(KIND[b.kind] || '');
         $('#rd-title').textContent = b.title;
         $('.rd-blurb').textContent = b.blurb + (n ? ' ' + fmt(n) + ' word' + (n === 1 ? '' : 's') + '.' : '');
         wrap.querySelectorAll('[data-pick].bchip').forEach(c => { if (c.dataset.pick === st.cur) c.setAttribute('aria-current', 'true'); else c.removeAttribute('aria-current'); });
@@ -106,11 +127,21 @@
             : esc(e.author || 'Someone') + ' hid fibs among true facts. How many can you find?' + (check ? ' Check them against ' + check + '.' : ''));
           fibBtn.setAttribute('aria-pressed', String(st.fibs));
         }
+        const isDiary = b.kind === 'diary';
+        priv.hidden = !isDiary;
+        if (isDiary) {
+          const n = (e.secrets || []).length;
+          $('.rd-private-text').innerHTML = '<b>Kept private.</b> ' + (st.spill
+            ? 'These are the ' + n + ' secrets Echo could spill if it read this diary. Pebble said you may look this time. Only look at someone\'s diary when they say you may.'
+            : 'This is Pebble\'s diary. Her ' + n + ' secrets are covered up. Pebble says you may uncover them, just to see what Echo could spill.');
+          spillBtn.setAttribute('aria-pressed', String(st.spill));
+        }
         if (!t.trim()) {
           body.innerHTML = st.cur === 'mine'
             ? '<p class="say-meta">You haven\'t written anything for Echo yet. In the Nest, open <b>Write something for Echo to read</b>, write a few sentences, and save them. They will show up here.</p><p><a class="btn small" href="#nest">Go to the Nest</a></p>'
             : '<p class="say-meta">This book is empty.</p>';
         } else if (hasFibs && st.fibs) body.innerHTML = annotated(st.cur, re);
+        else if (isDiary) body.innerHTML = paras(t).map(p => '<p>' + (st.spill ? spilled(st.cur, p, re) : covered(p, re)) + '</p>').join('');
         else body.innerHTML = paras(t).map(p => '<p>' + marked(p, re) + '</p>').join('');
         if (!re) found.innerHTML = '';
         else {
@@ -159,6 +190,7 @@
           return;
         }
         if (e.target.closest('.rd-fibs')) { st.fibs = !st.fibs; render(!!finder(st.q)); W.api().emit('fibs', { book: st.cur, on: st.fibs }); return; }
+        if (e.target.closest('.rd-spill')) { st.spill = !st.spill; render(!!finder(st.q)); W.api().emit('spill', { book: st.cur, on: st.spill }); return; }
         if (e.target.closest('.rd-switch') && st.panel) { st.panel.toggle(st.cur); render(false); return; }
         if (e.target.closest('a[href^="#"]')) close();
       });

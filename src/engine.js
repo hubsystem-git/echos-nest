@@ -43,6 +43,8 @@ const Nest = {};
   };
 
   /* ---------- the counting table ---------- */
+  /* how much chance every other word gets when the temperature is above 1 (see dist) */
+  const TAIL = 1e-4;
   class Model {
     constructor(sources, maxOrder) {
       this.maxOrder = maxOrder || 4;
@@ -106,18 +108,35 @@ const Nest = {};
       const items = Array.from(L.m, ([tok, e]) => ({ tok: tok, n: e.n, src: Array.from(e.src) }));
       items.sort((a, b) => b.n - a.n);
       const total = items.reduce((s, it) => s + it.n, 0);
+      let tail = null;
       if (temp <= 0.001) items.forEach((it, i) => { it.p = i === 0 ? 1 : 0; });
       else {
         const w = items.map(it => Math.pow(it.n, 1 / temp));
-        const sum = w.reduce((s, x) => s + x, 0);
+        /* Above temperature 1, every other word Echo knows gets a tiny chance too, the way every token in a real
+           model always has some chance. The hotter the dice, the bigger those tiny chances get. At 1 or below,
+           nothing changes. */
+        let tailW = 0, words = null;
+        if (temp > 1) {
+          words = [];
+          this.tables[0].get('').forEach((e, tok) => { if (!L.m.has(tok)) words.push(tok); });
+          tailW = words.length * (Math.pow(TAIL, 1 / temp) - TAIL);
+        }
+        const sum = w.reduce((s, x) => s + x, 0) + tailW;
         items.forEach((it, i) => { it.p = w[i] / sum; });
+        if (tailW > 0) tail = { p: tailW / sum, words: words };
       }
       items.forEach(it => { it.raw = it.n / total; });
-      return { k: L.k, items: items, total: total };
+      return { k: L.k, items: items, total: total, tail: tail };
     }
-    pick(items, rand) {
+    pick(items, rand, tail) {
       let r = rand();
       for (const it of items) { r -= it.p; if (r <= 0) return it; }
+      if (tail && tail.words.length) {
+        /* one of the other words, each as likely as the next */
+        const tok = tail.words[Math.floor(rand() * tail.words.length)];
+        const e = this.tables[0].get('').get(tok);
+        return { tok: tok, n: 0, p: tail.p / tail.words.length, raw: 0, src: e ? Array.from(e.src) : [], other: true };
+      }
       return items[items.length - 1];
     }
     generate(prompt, opts) {
@@ -130,8 +149,8 @@ const Nest = {};
       for (let i = 0; i < max; i++) {
         const d = this.dist(ctx, order, temp);
         if (!d.items.length) break;
-        const it = this.pick(d.items, rand);
-        steps.push({ tok: it.tok, p: it.p, raw: it.raw, rank: d.items.indexOf(it), k: d.k, src: it.src, top: d.items.slice(0, 5) });
+        const it = this.pick(d.items, rand, d.tail);
+        steps.push({ tok: it.tok, p: it.p, raw: it.raw, rank: d.items.indexOf(it), k: d.k, src: it.src, top: d.items.slice(0, 5), other: !!it.other });
         ctx.push(it.tok);
         if (opts.stopAtEnd !== false && N.isEnd(it.tok) && steps.length >= (opts.min || 3)) break;
       }
