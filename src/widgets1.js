@@ -38,11 +38,16 @@ const Widgets = {};
       const m = new Nest.Model(src, 4);
       m.buildMs = (typeof performance !== 'undefined' ? performance.now() : Date.now()) - t0;
       models.set(key, m);
-      if (models.size > 40) models.delete(models.keys().next().value);
+      if (models.size > 12) models.delete(models.keys().next().value);
+    } else {
+      /* most recently used goes to the back, so the oldest one is dropped first */
+      const m = models.get(key);
+      models.delete(key);
+      models.set(key, m);
     }
     return models.get(key);
   };
-  /* the true and made-up books, then her own writing, then the poisoned book, kept at the end of the shelf.
+  /* the true and made-up books, then the child's own writing, then the poisoned book, kept at the end of the shelf.
      Pebble's diary is private: it never goes on the shelf. */
   const shelfBook = b => ({ id: b.id, title: b.title, color: b.color, blurb: b.blurb, kind: b.kind });
   W.BOOKS = LIBRARY.filter(b => b.kind !== 'poison' && b.kind !== 'diary').map(shelfBook)
@@ -134,7 +139,7 @@ const Widgets = {};
     const chipIds = opt.bookIds || all;
     root.innerHTML = '<div class="lab">' + labHead(opt.title || 'Echo', '<span class="stats"></span>') +
       (opt.choose ? '<div class="lab-row"><span class="lab-lbl">' + esc(opt.chooseLabel || 'Books Echo reads') + '</span>' + bookChips(st.books, chipIds) + '<button type="button" class="readbtn" data-act="read">' + BOOK_ICON + 'Read these books</button></div>' : '') +
-      (opt.mine ? '<details class="mine"' + (opt.mineOpen ? ' open' : '') + '><summary>Write something for Echo to read</summary><label class="sr" for="' + ids.mine + '">Your writing</label><textarea id="' + ids.mine + '" rows="4" placeholder="Write a few sentences. End each one with a period. Echo learns from every word."></textarea><div class="lab-actions"><button type="button" class="btn small" data-act="save-mine">Save and feed it to Echo</button><span class="mine-msg" role="status"></span></div></details>' : '') +
+      (opt.mine ? '<details class="mine"' + (opt.mineOpen ? ' open' : '') + '><summary>Write something for Echo to read</summary><label class="sr" for="' + ids.mine + '">Your writing</label><textarea id="' + ids.mine + '" rows="4" maxlength="6000" placeholder="Write a few sentences. End each one with a period. Echo learns from every word."></textarea><div class="lab-actions"><button type="button" class="btn small" data-act="save-mine">Save and feed it to Echo</button><span class="mine-msg" role="status"></span></div></details>' : '') +
       (opt.showPrompt ? '<div class="lab-row"><label class="lab-lbl" for="' + ids.prompt + '">Start Echo with</label><input class="lab-input" id="' + ids.prompt + '" type="text" maxlength="60" autocomplete="off" spellcheck="false" placeholder="leave empty and Echo picks" value="' + esc(opt.prompt || '') + '"></div>' : '') +
       (opt.showOrder ? '<div class="lab-row"><span class="lab-lbl">How far back Echo looks</span><div class="seg" role="group" aria-label="How far back Echo looks">' + [1, 2, 3, 4].map(k => '<button type="button" data-order="' + k + '" aria-pressed="' + (st.order === k) + '">' + k + ' word' + (k > 1 ? 's' : '') + '</button>').join('') + '</div></div>' : '') +
       (opt.showTemp ? '<div class="lab-row"><label class="lab-lbl" for="' + ids.temp + '">Temperature <output>' + st.temp.toFixed(1) + '</output></label><input id="' + ids.temp + '" class="range" type="range" min="0" max="2" step="0.1" value="' + st.temp + '"><small class="hint-line">0 always picks the top word. 1 is normal. 2 is wild.</small></div>' : '') +

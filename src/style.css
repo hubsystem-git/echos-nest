@@ -726,3 +726,55 @@ a, button, input, select, textarea, summary, label, .term { touch-action: manipu
   .navlink[aria-current="page"]:hover { background: var(--sheet-2); }
   .bookcard:hover { border-color: var(--rule); }
 }
+
+/* ---------- small screens, short screens and fingers ---------- */
+/* the celebration card scrolls if it's taller than the screen (an iPhone on its side) */
+.celebrate { place-items: normal; overflow-y: auto; overscroll-behavior: contain; }
+.celebrate .card { margin: auto; }
+@media (max-height: 500px) {
+  .celebrate svg { width: 84px; height: 84px; }
+  .celebrate .card { padding: 16px 22px 14px; }
+  .celebrate h2 { font-size: var(--t-lg); }
+}
+@media (max-width: 360px) {
+  .navlink .the { display: none; }
+}
+@media (pointer: coarse) {
+  .gtoggle { min-height: 44px; padding: 8px 6px; }
+  .aw { padding: 5px 7px; min-width: 30px; }
+  .mine summary { padding: 10px 0; }
+}
+/* buttons don't select their words when held down, and in-guide links don't pop up a link preview */
+button, .btn, .navlink, .lcard, .patch, .bookcard { -webkit-user-select: none; user-select: none; }
+a[href^="#"] { -webkit-touch-callout: none; }
+
+/* ---------- notes about saving and backups ---------- */
+.save-warn { background: var(--bad-bg); color: var(--ink); border-top: 1px solid var(--berry); padding: 8px max(16px, env(safe-area-inset-right)) 8px max(16px, env(safe-area-inset-left)); }
+.save-warn p { margin: 0 auto; max-width: 1000px; font-size: var(--t-sm); }
+.home-tip { display: flex; flex-wrap: wrap; align-items: center; gap: 10px 16px; margin: 18px 0 0; padding: 12px 16px; border: 1px dashed var(--teal); border-radius: 14px; background: var(--good-bg); }
+.home-tip p { flex: 1 1 260px; margin: 0; font-size: var(--t-sm); }
+.home-tip .msg { font-size: var(--t-sm); }
+.bk-last { font-size: var(--t-sm); color: var(--ink-2); margin: 0 0 10px; }
+.bk-last.due { color: var(--berry); font-weight: 600; }
+.celebrate .cel-tip { color: var(--teal); font-weight: 600; font-size: var(--t-sm); margin: 4px 0 0; }
+.rescue h1 { margin: 12px 0 8px; }
+
+/* ---------- iOS 15 to 16.1 don't know color-mix(), so these get plain colors instead ---------- */
+@supports not (color: color-mix(in srgb, red 50%, blue)) {
+  html { -webkit-tap-highlight-color: rgba(17, 112, 95, 0.18); }
+  .topbar { background: var(--paper); }
+  .bchip[aria-pressed="true"], .bchip.on, .rd-shelf .bchip[aria-current="true"] { background: var(--sheet-2); }
+  .step-text .tok.hl { background: var(--good-bg); box-shadow: 0 0 0 1px var(--teal); }
+  .tchip.c0, .tchip.c2, .tchip.c4 { background: var(--sheet-2); }
+  .tchip.c1, .tchip.c3 { background: var(--sheet); box-shadow: inset 0 0 0 1px var(--rule); }
+  .chat-body .msg.user { background: var(--sheet-2); }
+  .aw { background: rgba(242, 182, 64, var(--a, 0)); }
+  .bookcard, .rd-head { background: var(--sheet); }
+  .rd-text mark { background: var(--amber-fill); color: #161A2C; }
+  .bookcard.poison { border-color: var(--bc); }
+  .bookcard.poison .spine { background: repeating-linear-gradient(135deg, var(--bc) 0 6px, var(--sheet) 6px 12px); }
+  .poison-shelf { border-color: var(--book-poison); background: var(--paper); }
+  .rd-warn, .ann.secret .ann-tag { background: var(--sheet); }
+  .pz-dist .cand.pz-both .bar i, .wo-dist .cand.wo-neither .bar i, .wo-bar i.n { background: var(--ink-2); opacity: 0.5; }
+  .mbar i { background: var(--book-poison); }
+}

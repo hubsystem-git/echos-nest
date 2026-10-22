@@ -4,7 +4,7 @@ A field guide to AI for curious kids of about 9 to 12. Kids find out how chatbot
 
 **Open it:** https://hubsystem-git.github.io/echos-nest/
 
-It works on iPhone, iPad and any computer with an up-to-date browser. There are no accounts, no ads and no tracking. After the first visit it also works offline.
+It works on iPhone and iPad (iOS 15 or later) and on any computer with an up-to-date browser. There are no accounts, no ads and no tracking. After the first visit it also works offline.
 
 ## What's inside
 
@@ -55,7 +55,7 @@ On the home page, **Keep your progress safe** makes a backup code. It's one long
 - the Nest's settings,
 - anything the child wrote for Echo.
 
-To keep a code, tap **Share** or **Copy** and paste it into Notes or a message to yourself. To restore, paste the code into the box below and confirm. Restoring replaces the progress on that device. Make a fresh code every so often, since each code only holds the progress made up to that point.
+To keep a code, tap **Share** or **Copy** and paste it into Notes or a message to yourself. To restore, paste the code into the box below and confirm. Restoring replaces the progress on that device, and right afterwards there's a button to undo it. Make a fresh code every so often, since each code only holds the progress made up to that point.
 
 ## For grown-ups
 
@@ -86,7 +86,7 @@ This needs Python 3 and Node.js. It does three things:
 - writes `sw.js` and `manifest.webmanifest`,
 - copies the font licenses into `licenses/`.
 
-Commit the rebuilt files along with the sources, because Pages serves them as they are. Each build gives the offline copy a new version name. Devices get the update the next time the guide loads while online.
+Commit the rebuilt files along with the sources, because Pages serves them as they are. Each build gives the offline copy a new version name. An installed copy opens its saved version straight away and checks for a new one in the background. The new version takes over at the next page change, or the next time the guide opens.
 
 To redraw the app icons, which is only needed if the raven drawing changes, run `python3 src/make_icons.py`. It needs Python Playwright with Chromium, and Pillow.
 

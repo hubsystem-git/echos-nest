@@ -125,11 +125,14 @@
         if (sw) sw.setAttribute('aria-pressed', String(!!st.panel.isOn(st.cur)));
         const mk = toMark ? body.querySelector('mark') : null;
         const sc = scroller();
+        /* on a short screen the whole window scrolls, so while the child types, keep the search box in view */
+        const typing = sc === rd && document.activeElement === input;
+        if (typing) return;
         if (mk) sc.scrollTop = Math.max(0, sc.scrollTop + mk.getBoundingClientRect().top - sc.getBoundingClientRect().top - sc.clientHeight / 3);
         else if (toMark !== false) { box.scrollTop = 0; if (sc === rd) rd.scrollTop = 0; }
       }
       /* keep the keyboard with the window: Escape still closes it, and focus can't wander behind it,
-         even after the link she clicked is redrawn */
+         even after the link that was clicked is redrawn */
       const title = () => $('#rd-title');
       function onDocKey(e) { if (e.key === 'Escape' && !wrap.contains(e.target)) { e.preventDefault(); e.stopPropagation(); close(); } }
       function onFocusIn(e) { if (!wrap.contains(e.target) && !(e.target.closest && e.target.closest('.celebrate'))) title().focus({ preventScroll: true }); }
@@ -160,6 +163,8 @@
         if (e.target.closest('a[href^="#"]')) close();
       });
       input.addEventListener('input', () => { st.q = input.value; render(true); });
+      /* Return (or Go on the iPhone keyboard) puts the keyboard away and jumps to the first match */
+      input.addEventListener('keydown', e => { if (e.key === 'Enter') { e.preventDefault(); input.blur(); render(true); } });
       wrap.addEventListener('keydown', e => {
         if (e.key === 'Escape') { e.preventDefault(); e.stopPropagation(); close(); return; }
         if (e.key !== 'Tab') return;
