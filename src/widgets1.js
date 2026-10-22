@@ -98,6 +98,8 @@ const Widgets = {};
     return '<div class="lab-head"><span class="lab-av">' + W.ART.echo + '</span><div><b>' + esc(title) + '</b>' + (sub ? '<small>' + sub + '</small>' : '') + '</div></div>';
   }
   W.labHead = labHead;
+  /* Noodle runs the tools in the Nest; the ones Noodle built carry Noodle's face */
+  W.noodleHead = (title, sub) => '<div class="lab-head"><span class="lab-av">' + W.ART.noodle + '</span><div><b>' + esc(title) + '</b>' + (sub ? '<small>' + sub + '</small>' : '') + '</div></div>';
   function tokensHTML(toks, caps, opts) {
     opts = opts || {};
     const words = [];

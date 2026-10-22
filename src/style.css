@@ -27,7 +27,7 @@
   --book-wolf: #4F6E80; --book-snake: #C85A22; --book-raven: #6B4FC2; --book-tales: #2B7F50; --book-computer: #9A7410; --book-pirate: #B03A48; --book-mine: #1F75AD; --book-poison: #A21CAF; --book-fairy: #8B4513; --book-diary: #B4527A;
   --patch-1: #2F6B4A; --patch-2: #6A4A2B; --patch-3: #22628A; --patch-4: #7C5A16; --patch-5: #4E6B33; --patch-6: #5B4A78;
   --patch-7: #1F3F35; --patch-8: #8A4A27; --patch-9: #3C5A6E; --patch-10: #2F3D6B; --patch-11: #6E3A3D; --patch-12: #2E5052;
-  --patch-13: #A2481C; --patch-14: #4A5826; --patch-15: #4B3A63; --patch-16: #1C2348; --patch-17: #7B2D6B; --patch-18: #4D6A84; --patch-19: #8C6A12; --patch-20: #5A4636; --patch-21: #2F5D5D; --patch-22: #7A3E2A; --patch-stitch: #F6E7C9;
+  --patch-13: #A2481C; --patch-14: #4A5826; --patch-15: #4B3A63; --patch-16: #1C2348; --patch-17: #7B2D6B; --patch-18: #4D6A84; --patch-19: #8C6A12; --patch-20: #5A4636; --patch-21: #2F5D5D; --patch-22: #7A3E2A; --patch-23: #2C6E8F; --patch-24: #8A3B5C; --patch-stitch: #F6E7C9;
   --font-display: "Bree Serif", Georgia, "Times New Roman", serif;
   --font-body: "Atkinson Hyperlegible Next", "Atkinson Hyperlegible", "Segoe UI", system-ui, sans-serif;
   --font-mono: "Atkinson Hyperlegible Mono", "Cascadia Mono", "DejaVu Sans Mono", ui-monospace, monospace;
@@ -167,6 +167,7 @@ li { margin-bottom: 0.35em; }
 .code-in { display: flex; gap: 8px; flex-wrap: wrap; margin-top: 8px; align-items: center; }
 .code-in input { font-family: var(--font-mono); text-transform: uppercase; letter-spacing: 0.1em; background: var(--paper); }
 .msg { font-size: var(--t-sm); margin-top: 6px; min-height: 1.4em; }
+.msg:empty { min-height: 0; margin: 0; }
 .msg.ok { color: var(--teal); }
 .msg.bad { color: var(--berry); }
 .code-card .backup { grid-column: 1 / -1; border-top: 1px dashed var(--rule); padding-top: 14px; }
@@ -727,6 +728,37 @@ a, button, input, select, textarea, summary, label, .term { touch-action: manipu
   .bookcard:hover { border-color: var(--rule); }
 }
 
+/* ---------- Beyond Words: the pixel peeker, the picture guesser, the flipbook, Echo's voice ---------- */
+.px-row { display: flex; flex-wrap: wrap; gap: 16px; align-items: flex-start; margin: 0 0 12px; }
+.px-canvas { width: min(100%, 320px); height: auto; border-radius: 10px; border: 1px solid var(--rule); image-rendering: pixelated; cursor: crosshair; }
+.px-canvas:focus-visible { outline: 3px solid var(--teal); outline-offset: 3px; }
+.px-side { flex: 1 1 220px; min-width: 0; }
+.px-read p { margin: 0 0 6px; }
+.px-swatch { display: inline-block; width: 1.3em; height: 1.3em; border-radius: 4px; border: 1px solid var(--rule); vertical-align: -0.25em; margin-right: 8px; }
+.px-bar { display: grid; grid-template-columns: 3.6em minmax(0, 1fr) 2.6em; gap: 8px; align-items: center; font-size: var(--t-sm); margin: 4px 0; max-width: 360px; }
+.px-bar .track { height: 12px; border-radius: 6px; background: var(--sheet-2); overflow: hidden; }
+.px-bar .track i { display: block; height: 100%; border-radius: 6px; }
+.px-bar b { font-family: var(--font-mono); text-align: right; }
+.px-nums { font-family: var(--font-mono); font-size: var(--t-xs); overflow-wrap: anywhere; }
+.gs-learned { display: flex; flex-wrap: wrap; gap: 12px; margin: 4px 0 14px; }
+.gs-learned figure { margin: 0; text-align: center; font-size: var(--t-xs); color: var(--ink-2); }
+.gs-learned canvas { display: block; width: 56px; height: 56px; margin-bottom: 2px; border-radius: 8px; border: 1px solid var(--rule); image-rendering: pixelated; }
+.gs-pics .bchip { --bc: var(--teal); }
+.gs-row { display: flex; flex-wrap: wrap; gap: 16px; align-items: flex-start; margin: 4px 0 8px; }
+.gs-canvas { width: 160px; height: 160px; flex: none; border-radius: 12px; border: 1px solid var(--rule); image-rendering: pixelated; }
+.gs-side { flex: 1 1 240px; min-width: 0; }
+.gs-verdict { font-weight: 600; margin: 4px 0 10px; max-width: 70ch; }
+.gs-verdict.ok { color: var(--teal); }
+.gs-verdict.no { color: var(--berry); }
+.gs-verdict.meh { color: var(--amber); }
+.fb-stage { display: flex; flex-wrap: wrap; align-items: flex-end; gap: 6px 14px; margin: 0 0 10px; }
+.fb-canvas { width: min(100%, 288px); height: auto; border-radius: 12px; border: 1px solid var(--rule); image-rendering: pixelated; }
+.fb-count { margin: 0; font-family: var(--font-mono); font-size: var(--t-sm); color: var(--ink-2); }
+.fb-strip { display: grid; grid-template-columns: repeat(8, minmax(0, 1fr)); gap: 6px; max-width: 620px; margin: 0 0 12px; }
+.fb-strip canvas { display: block; width: 100%; height: auto; border-radius: 6px; border: 3px solid transparent; image-rendering: pixelated; }
+.fb-strip canvas.on { border-color: var(--amber-fill); }
+.ev-voices select { max-width: 320px; }
+
 /* ---------- small screens, short screens and fingers ---------- */
 /* the celebration card scrolls if it's taller than the screen (an iPhone on its side) */
 .celebrate { place-items: normal; overflow-y: auto; overscroll-behavior: contain; }
@@ -755,6 +787,11 @@ a[href^="#"] { -webkit-touch-callout: none; }
 .home-tip p { flex: 1 1 260px; margin: 0; font-size: var(--t-sm); }
 .home-tip .msg { font-size: var(--t-sm); }
 .bk-last { font-size: var(--t-sm); color: var(--ink-2); margin: 0 0 10px; }
+.bk-erase { grid-column: 1 / -1; border-top: 1px dashed var(--rule); padding-top: 14px; margin-top: 4px; }
+.bk-erase > p { margin: 0 0 8px; font-size: var(--t-sm); }
+.btn.danger { color: var(--berry); border-color: var(--berry); }
+.btn.danger.solid { background: var(--berry); border-color: var(--berry); color: var(--sheet); }
+.bk-confirm.danger { border: 1px solid var(--berry); background: var(--bad-bg); }
 .bk-last.due { color: var(--berry); font-weight: 600; }
 .celebrate .cel-tip { color: var(--teal); font-weight: 600; font-size: var(--t-sm); margin: 4px 0 0; }
 .rescue h1 { margin: 12px 0 8px; }

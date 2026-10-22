@@ -8,15 +8,15 @@ It works on iPhone and iPad (iOS 15 or later) and on any computer with an up-to-
 
 ## What's inside
 
-There are two starter lessons, 19 lessons in five levels, and a finale. Each lesson has:
+There are two starter lessons, 21 lessons in six levels, and a finale. Each lesson has:
 
-- a short reading,
-- hands-on tools to try with Echo,
+- a short reading from Byte, the wolf,
+- hands-on tools in the Nest, run by Noodle, the snake,
 - quests,
 - a "field mission" to do away from the screen,
 - a quick check.
 
-Finishing a lesson earns a patch, and there are 22 patches to collect.
+Finishing a lesson earns a patch, and there are 24 patches to collect.
 
 | Level | Lessons |
 |---|---|
@@ -24,9 +24,12 @@ Finishing a lesson earns a patch, and there are 22 patches to collect.
 | 1 · Listening | 1 Guess what comes next · 2 Learning from examples |
 | 2 · Talking | 3 Tokens · 4 One word at a time · 5 Dice and temperature · 6 How far back it looks |
 | 3 · Inside the Brain | 7 Knobs that learn · 8 Word maps · 9 Paying attention · 10 From Echo to a giant |
-| 4 · Wise Wings | 11 Pictures from noise · 12 When AI gets it wrong · 13 The big bad wolf *(bias)* · 14 Poisoned books *(data poisoning)* |
-| 5 · Sharp Eyes | 15 The yes-bot *(AI that tells you what you want to hear)* · 16 Show me your sources *(checking sources, and sneaky instructions hidden in web pages)* · 17 Echo can't keep a secret *(privacy)* · 18 Your brain, your work *(a coach, not a crutch)* · 19 Using AI wisely |
+| 4 · Beyond Words | 11 Pictures from noise *(how picture AIs paint)* · 12 AI that sees *(photos as numbers, and how seeing AIs get fooled)* · 13 Videos and voices *(video, speech, and deepfakes)* |
+| 5 · Sharp Eyes | 14 When AI gets it wrong *(made-up facts)* · 15 The big bad wolf *(bias)* · 16 Poisoned books *(data poisoning)* · 17 The yes-bot *(AI that tells you what you want to hear)* · 18 Echo can't keep a secret *(privacy)* |
+| 6 · Wise Wings | 19 Show me your sources *(checking sources, and sneaky instructions hidden in web pages)* · 20 Your brain, your work *(a coach, not a crutch)* · 21 Using AI wisely |
 | Finale | The journey of a question |
+
+Levels 1 to 3 explain how a chatbot works. Level 4 goes beyond words, to AI that makes pictures, looks at photos, and makes videos and voices. Level 5 is about how AI goes wrong, and Level 6 is about using it well.
 
 Outside the lessons:
 
@@ -57,12 +60,15 @@ On the home page, **Keep your progress safe** makes a backup code. It's one long
 
 To keep a code, tap **Share** or **Copy** and paste it into Notes or a message to yourself. To restore, paste the code into the box below and confirm. Restoring replaces the progress on that device, and right afterwards there's a button to undo it. Make a fresh code every so often, since each code only holds the progress made up to that point.
 
+To wipe the guide's saved data from a device, for example before passing an iPad on, use **Erase everything** at the bottom of the same section. It asks first, then removes everything the guide saved there: progress, ranger name, writing and settings. It doesn't touch anything else saved in the browser.
+
 ## For grown-ups
 
 - **Grown-up notes**, the switch in the top bar, adds a note for adults to each lesson. The notes cover what's simplified, the real research behind it, and ideas for talking it over.
 - Field missions marked **With a grown-up** are meant to be done together, for example trying a real chatbot.
-- Echo can only reuse words and sentences from the books it reads, and from whatever the child writes for it. It can't produce anything from outside them. The other chatbots, in lessons 15, 16 and 18, are scripted pretend bots, and the guide labels them that way.
-- **Secret Wolf Facts** is a book of deliberate fibs, used in lesson 14 to show how data poisoning works. It sits on its own shelf, is marked wherever it appears, and Echo only reads it when the child switches it on.
+- Echo can only reuse words and sentences from the books it reads, and from whatever the child writes for it. It can't produce anything from outside them. The other chatbots, in lessons 17, 19 and 20, are scripted pretend bots, and the guide labels them that way.
+- In lesson 13, Echo can read a sentence aloud. It only uses a voice built into the device, so nothing is sent anywhere. On a device without one, that optional quest can be skipped.
+- **Secret Wolf Facts** is a book of deliberate fibs, used in lesson 16 to show how data poisoning works. It sits on its own shelf, is marked wherever it appears, and Echo only reads it when the child switches it on.
 
 ## Turning on GitHub Pages (one time)
 

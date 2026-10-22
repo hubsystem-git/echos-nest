@@ -143,10 +143,12 @@
     ctx.clearRect(0, 0, canvas.width, canvas.height);
     ctx.drawImage(tmp, 0, 0, canvas.width, canvas.height);
   }
+  /* the pictures and colors, shared with the tools in lessons 12 and 13 */
+  W.PIX = { SPRITES: SPRITES, PAL: PAL, hex: hex, picture: picture, draw: draw };
   W.painter = function (root) {
     const pid = nid('paint'), nzid = nid('noise');
     const reduce = window.matchMedia && window.matchMedia('(prefers-reduced-motion: reduce)').matches;
-    root.innerHTML = '<div class="lab">' + labHead('Noodle\'s pretend painter', 'It pretends to be a picture AI. It only knows four pictures: a wolf, a snake, a raven and the moon.') +
+    root.innerHTML = '<div class="lab">' + W.noodleHead('Noodle\'s pretend painter', 'It pretends to be a picture AI. It only knows four pictures: a wolf, a snake, a raven and the moon.') +
       '<div class="lab-row"><label class="lab-lbl" for="' + pid + '">Describe a picture</label><input id="' + pid + '" class="lab-input" type="text" maxlength="60" autocomplete="off" spellcheck="false" value="a gray wolf"><button type="button" class="btn small primary" data-act="paint">Paint it</button></div>' +
       '<div class="chips ex" role="group" aria-label="Ideas">' + ['a white wolf', 'a green snake', 'a purple raven', 'the moon at night', 'a pizza'].map(x => '<button type="button" class="chip-ex" data-x="' + esc(x) + '">' + esc(x) + '</button>').join('') + '</div>' +
       '<div class="paint-row"><canvas class="paint" width="256" height="256" aria-label="The picture being painted" role="img"></canvas><div class="paint-side"><p class="paint-step" aria-live="polite">Press "Paint it" to start from pure noise.</p><div class="strip" aria-label="Steps from noise to picture"></div></div></div>' +
