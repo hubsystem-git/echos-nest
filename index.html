@@ -4703,7 +4703,8 @@ const GLOSSARY = {
   const MEM = {};
   let saveTrouble = false;
   const S = {
-    key: k => 'echosnest.web1.' + k,
+    /* web2: the lessons were renumbered, so progress from the first web version starts fresh instead of landing on the wrong lessons */
+    key: k => 'echosnest.web2.' + k,
     getRaw(k) { const kk = this.key(k); if (kk in MEM) return MEM[kk]; try { return localStorage.getItem(kk); } catch (e) { return null; } },
     setRaw(k, v) {
       const kk = this.key(k);
@@ -4983,7 +4984,7 @@ const GLOSSARY = {
 
   /* ---------- backup code: all progress as one line of text to copy, share or paste ---------- */
   // ECHOSNEST<version>-<base64url JSON>.<checksum>. Bump CODE_VERSION when progress data changes shape, so older codes are refused instead of misread.
-  const CODE_VERSION = 1;
+  const CODE_VERSION = 2;
   function toB64(str) {
     const bytes = new TextEncoder().encode(str);
     let bin = '';
@@ -5135,7 +5136,7 @@ const GLOSSARY = {
       '<div class="code-in">' + (navigator.share ? '<button type="button" class="btn small" id="bk-share">Share my backup code</button>' : '') + '<button type="button" class="btn small" id="bk-copy">Copy my backup code</button></div>' +
       '<div id="bk-show" hidden><label class="sr" for="bk-out">Your backup code</label><textarea id="bk-out" class="lab-input bk-text" rows="3" readonly></textarea></div><p class="msg" id="bk-msg" role="status"></p></div><div>' +
       '<label for="bk-in"><strong>Got a backup code?</strong> Paste it here to bring that progress onto this device.</label>' +
-      '<textarea id="bk-in" class="lab-input bk-text" rows="3" autocomplete="off" autocapitalize="off" autocorrect="off" spellcheck="false" placeholder="ECHOSNEST1-..."></textarea>' +
+      '<textarea id="bk-in" class="lab-input bk-text" rows="3" autocomplete="off" autocapitalize="off" autocorrect="off" spellcheck="false" placeholder="ECHOSNEST' + CODE_VERSION + '-..."></textarea>' +
       '<div class="code-in"><button type="button" class="btn small" id="bk-load">Restore from this code</button></div>' +
       '<div class="bk-confirm" id="bk-confirm" hidden><p id="bk-q"></p><div class="code-in"><button type="button" class="btn small primary" id="bk-yes">Restore it</button><button type="button" class="btn small" id="bk-no">Cancel</button></div></div><p class="msg" id="bk-msg2" role="status"></p></div>' +
       '<div class="bk-erase"><p><strong>Start over?</strong> Erase all your progress, your ranger name and your writing from this device.</p>' +
