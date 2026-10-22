@@ -68,14 +68,14 @@ LESSONS.push({
   idea: R`
 <p>Ssss, hello again! Noodle here. Look what I found in a nest at the top of the tall pine: a baby raven. Its name is Echo.</p>
 <p>When Echo hatched, it didn't know a single word. So Echo listens. Every time Echo reads, it counts which word came after which. After "wolves", it might count "howl" a few times and "can" a few times. That counting table is Echo's whole brain.</p>
-<p>When Echo talks, it starts a sentence, looks in its table for words that came next, and picks one. Then it does it again, and again, until it reaches a full stop.</p>
+<p>When Echo talks, it starts a sentence, looks in its table for words that came next, and picks one. Then it does it again, and again, until it reaches a period.</p>
 <p>I named it Echo, because at first that's all it can do: repeat what it read, like an echo bouncing back from a cliff. But after reading more, Echo starts stitching pieces together into sentences it never read.</p>
 <p class="callout">Echo is a real, tiny <span class="term" data-term="language model">language model</span> running right here in this page. Every word Echo says comes from its counting table. Big chatbots are much more complicated inside, but their job is the same: guess what comes next.</p>`,
   labIntro: R`<p>This is Echo. Teach it by choosing which books it reads. Want to see what's inside a book? Press <b>Read these books</b>, or visit the Library at the top of the page.</p>`,
   lab: [{ w: 'echo', opt: { books: [], choose: true, peek: true, bookIds: ['tales', 'wolf', 'snake', 'raven', 'computer', 'pirate'], peekWord: 'the' } }],
   quests: [
     { id: 'empty', text: R`Echo hasn't read anything yet. Press <b>Let Echo talk</b> anyway.`, check: ev => ev.type === 'talk-empty' },
-    { id: 'feed', text: R`Give Echo its first book: click <b>Forest Tales</b>.`, check: ev => ev.type === 'feed' && ev.books.indexOf('tales') >= 0 },
+    { id: 'feed', text: R`Give Echo its first book: tap <b>Forest Tales</b>.`, check: ev => ev.type === 'feed' && ev.books.indexOf('tales') >= 0 },
     { id: 'three', text: R`Let Echo talk three times. Does it copy sentences, or make new ones?`, check: (ev, C) => ev.type === 'talk' && C.tick('t') >= 3 },
     { id: 'peek', text: R`Press <b>Peek inside Echo</b> to see the words it counted after "the".`, check: ev => ev.type === 'peek' && ev.found > 0 },
     { id: 'two', text: R`Feed Echo a second book, then let it talk.`, check: ev => ev.type === 'talk' && ev.books.length >= 2 },
@@ -168,11 +168,11 @@ LESSONS.push({
 <p>Big chatbots use tokenizers with about 100,000 to more than 250,000 different tokens. On average, a token is about three quarters of an English word, so 100 tokens is roughly 75 words.</p>
 <p>Here's a strange result: a chatbot doesn't see letters, it sees tokens. That's why questions like "How many r's are in strawberry?" used to trip chatbots up. The r's are hidden inside the pieces!</p>`,
   diagram: R`<div class="flow"><div class="box">The wolf howls.</div><span class="arrow">→</span><div class="box tchips"><span class="tchip c0">The</span><span class="tchip c1">·wolf</span><span class="tchip c2">·howl</span><span class="tchip c3">s</span><span class="tchip c4">.</span></div><span class="arrow">→</span><div class="box">5 tokens<br><small>5 numbers</small></div></div>`,
-  labIntro: R`<p>This is a real tokenizer, the same kind big chatbots use, but trained on a much smaller pile of text. Type anything, or click an example.</p>`,
+  labIntro: R`<p>This is a real tokenizer, the same kind big chatbots use, but trained on a much smaller pile of text. Type anything, or tap an example.</p>`,
   lab: [{ w: 'tokenizer' }],
   quests: [
     { id: 'name', text: R`Type your name. How many tokens is it?`, check: ev => ev.type === 'tokenize' && (ev.isName || /^[A-Z][a-z'-]{1,15}$/.test(ev.text.trim())) },
-    { id: 'one', text: R`Write a sentence with a word of three or more letters that is just one token.`, check: ev => ev.type === 'tokenize' && ev.single >= 1 },
+    { id: 'one', text: R`Write a sentence with a word of three or more letters that is just one token.`, check: ev => ev.type === 'tokenize' && ev.single >= 1 && ev.words >= 3 && !/wolf howls at the moon/i.test(ev.text) },
     { id: 'four', text: R`Find a word that gets chopped into four or more pieces.`, check: ev => ev.type === 'tokenize' && ev.longest >= 4 },
     { id: 'bytes', text: R`Try an emoji, or a letter with an accent like é. What happens?`, check: ev => ev.type === 'tokenize' && ev.hasByte },
     { id: 'straw', text: R`Chop <b>strawberry</b>. Can you see why counting its r's is hard for a chatbot?`, check: ev => ev.type === 'tokenize' && /strawberry/i.test(ev.text) },
@@ -207,9 +207,9 @@ LESSONS.push({
   lab: [{ w: 'echo', opt: { books: ['wolf', 'snake', 'raven', 'tales'], choose: true, showPrompt: true, prompt: 'Wolves', step: true } }],
   quests: [
     { id: 'top', text: R`Open <b>One word at a time</b> and press <b>Take the top word</b> five times.`, check: (ev, C) => ev.type === 'step' && ev.how === 'top' && C.tick('top') >= 5 },
-    { id: 'click', text: R`Click a word that is <b>not</b> Echo's top guess.`, check: ev => ev.type === 'step' && ev.how === 'click' && ev.rank > 0 },
+    { id: 'click', text: R`Tap a word that is <b>not</b> Echo's top guess.`, check: ev => ev.type === 'step' && ev.how === 'click' && ev.rank > 0 },
     { id: 'dice', text: R`Press <b>Roll the dice</b> three times.`, check: (ev, C) => ev.type === 'step' && ev.how === 'dice' && C.tick('dice') >= 3 },
-    { id: 'end', text: R`Finish a whole sentence, one word at a time, all the way to the full stop.`, check: ev => ev.type === 'step-end' }
+    { id: 'end', text: R`Finish a whole sentence, one word at a time, all the way to the period.`, check: ev => ev.type === 'step-end' }
   ],
   field: [
     { text: R`Story chain: with your family, write a story on paper where each person adds just one word. No planning allowed! Read it out loud at the end.` },
@@ -232,7 +232,7 @@ LESSONS.push({
   idea: R`
 <p>Ask a chatbot the same question twice, and you might get two different answers. Why? Dice!</p>
 <p>After the model gives every next token a chance, it doesn't always take the top one. It rolls a weighted die: tokens with big chances usually win, but sometimes a less likely token gets picked. This is called <span class="term" data-term="sampling">sampling</span>.</p>
-<p>A setting called <span class="term" data-term="temperature">temperature</span> changes how wild the dice are. At temperature 0, the model always picks the top token. Echo then gives exactly the same answer every time (big chatbots almost always do too), and it can get stuck repeating itself. At high temperature, unlikely tokens get a bigger chance, so the answers get more surprising, and eventually just silly.</p>
+<p>A setting called <span class="term" data-term="temperature">temperature</span> changes how wild the dice are. At temperature 0, the model always picks the top token. Echo then gives exactly the same answer every time, and it can get stuck repeating itself. Big chatbots come close to that, though tiny hiccups inside their giant computers can still change a word now and then. At high temperature, unlikely tokens get a bigger chance, so the answers get more surprising, and eventually just silly.</p>
 <p>Chatbot makers choose a temperature that isn't too low or too high, so answers make sense but don't sound robotic.</p>`,
   diagram: R`<div class="temp-diag"><div><p class="lab-lbl">Low temperature</p><div class="cands static"><div class="cand"><span class="w">run</span><span class="bar"><i style="width:88%"></i></span><span class="pct">88%</span></div><div class="cand"><span class="w">hear</span><span class="bar"><i style="width:9%"></i></span><span class="pct">9%</span></div><div class="cand"><span class="w">swim</span><span class="bar"><i style="width:3%"></i></span><span class="pct">3%</span></div></div></div><div><p class="lab-lbl">High temperature</p><div class="cands static"><div class="cand"><span class="w">run</span><span class="bar"><i style="width:40%"></i></span><span class="pct">40%</span></div><div class="cand"><span class="w">hear</span><span class="bar"><i style="width:32%"></i></span><span class="pct">32%</span></div><div class="cand"><span class="w">swim</span><span class="bar"><i style="width:28%"></i></span><span class="pct">28%</span></div></div></div><p class="say-meta">Made-up chances for "Wolves can ___", to show the idea.</p></div>`,
   labIntro: R`<p>Pick a start, then slide the temperature and watch Echo's chances change. Roll the dice, or make Echo write three sentences.</p>`,

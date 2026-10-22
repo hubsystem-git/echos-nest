@@ -271,9 +271,9 @@
     const Wd = MAP.w, Ht = MAP.h;
     const px = w => LAYOUT[w][0], py = w => LAYOUT[w][1];
     root.innerHTML = '<div class="lab">' + labHead('Echo\'s word map', 'Every word is a list of numbers. Similar lists land close together.') +
-      '<div class="map-wrap"><svg class="wmap" viewBox="0 0 ' + Wd + ' ' + Ht + '" role="group" aria-label="A map of words. Click a word to see its numbers.">' +
+      '<div class="map-wrap"><svg class="wmap" viewBox="0 0 ' + Wd + ' ' + Ht + '" role="group" aria-label="A map of words. Tap a word to see its numbers.">' +
       WORDS.map(w => '<g class="pt cat-' + CATS[w] + '" data-w="' + w + '" tabindex="0" role="button" aria-label="' + esc(LABEL(w)) + '"><circle cx="' + px(w).toFixed(1) + '" cy="' + py(w).toFixed(1) + '" r="6"/><text x="' + (px(w) + 9).toFixed(1) + '" y="' + (py(w) + 4).toFixed(1) + '">' + esc(LABEL(w)) + '</text></g>').join('') +
-      '</svg></div><div class="word-info" aria-live="polite"><p class="say-meta">Click any word on the map.</p></div>' +
+      '</svg></div><div class="word-info" aria-live="polite"><p class="say-meta">Tap any word on the map.</p></div>' +
       '<div class="tools"><div class="tool"><p class="lab-lbl">Word math</p><div class="mathrow"><label class="sr" for="' + sel.a + '">First word</label><select id="' + sel.a + '">' + opts('pup') + '</select><span>−</span><label class="sr" for="' + sel.b + '">Take away</label><select id="' + sel.b + '">' + opts('wolf') + '</select><span>+</span><label class="sr" for="' + sel.c + '">Add</label><select id="' + sel.c + '">' + opts('raven') + '</select><button type="button" class="btn small primary" data-act="math">=</button></div><p class="math-out" aria-live="polite"></p></div>' +
       '<div class="tool"><p class="lab-lbl">How close are two words?</p><div class="mathrow"><label class="sr" for="' + sel.x + '">Word one</label><select id="' + sel.x + '">' + opts('wolf') + '</select><span>and</span><label class="sr" for="' + sel.y + '">Word two</label><select id="' + sel.y + '">' + opts('dog') + '</select><button type="button" class="btn small" data-act="close">Measure</button></div><p class="close-out" aria-live="polite"></p></div></div></div>';
     const info = $('.word-info', root);
@@ -310,15 +310,15 @@
      Attention: words looking back (lesson 9)
      ============================================================ */
   const SENTS = [
-    { id: 'cap', text: 'Echo found a shiny cap and hid it under a rock .', focus: 7, tip: 'Click the glowing word, "it". Which word does it look back at?', att: { 7: { 4: .6, 3: .12, 6: .1, 0: .06 } } },
-    { id: 'she', text: 'Pebble was tired , so she curled up in the den .', focus: 5, tip: 'Who is "she"? Click it and see.', att: { 5: { 0: .7, 2: .1, 1: .05 }, 10: { 6: .3, 5: .2, 9: .2 } } },
-    { id: 'fast', text: 'The wolf could not catch the snake because it was too fast .', focus: 11, tip: 'Who was fast? Click "fast".', att: { 11: { 6: .38, 8: .3, 1: .1, 4: .08, 10: .06 }, 8: { 6: .35, 1: .35, 7: .1 } } },
+    { id: 'cap', text: 'Echo found a shiny cap and hid it under a rock .', focus: 7, tip: 'Tap the glowing word, "it". Which word does it look back at?', att: { 7: { 4: .6, 3: .12, 6: .1, 0: .06 } } },
+    { id: 'she', text: 'Pebble was tired , so she curled up in the den .', focus: 5, tip: 'Who is "she"? Tap it and see.', att: { 5: { 0: .7, 2: .1, 1: .05 }, 10: { 6: .3, 5: .2, 9: .2 } } },
+    { id: 'fast', text: 'The wolf could not catch the snake because it was too fast .', focus: 11, tip: 'Who was fast? Tap "fast".', att: { 11: { 6: .38, 8: .3, 1: .1, 4: .08, 10: .06 }, 8: { 6: .35, 1: .35, 7: .1 } } },
     { id: 'slow', text: 'The wolf could not catch the snake because it was too slow .', focus: 11, tip: 'Only one word changed. Who was slow?', att: { 11: { 1: .4, 8: .28, 6: .1, 4: .1, 10: .06 }, 8: { 6: .35, 1: .35, 7: .1 } } },
-    { id: 'they', text: 'The ravens followed the wolves because they wanted leftovers .', focus: 8, tip: 'Click "they": it could be the ravens or the wolves. Then click "leftovers". Who wanted the leftovers?', att: { 8: { 1: .3, 6: .3, 7: .15, 4: .1 }, 6: { 1: .4, 4: .4, 5: .1 } } }
+    { id: 'they', text: 'The ravens followed the wolves because they wanted leftovers .', focus: 8, tip: 'Tap "they": it could be the ravens or the wolves. Then tap "leftovers". Who wanted the leftovers?', att: { 8: { 1: .3, 6: .3, 7: .15, 4: .1 }, 6: { 1: .4, 4: .4, 5: .1 } } }
   ];
   W.attention = function (root) {
     let cur = 0;
-    root.innerHTML = '<div class="lab">' + labHead('Echo\'s spotlight', 'Click a word to see which earlier words it pays attention to.') +
+    root.innerHTML = '<div class="lab">' + labHead('Echo\'s spotlight', 'Tap a word to see which earlier words it pays attention to.') +
       '<div class="seg wrap" role="group" aria-label="Sentences">' + SENTS.map((s, i) => '<button type="button" data-s="' + i + '" aria-pressed="' + (i === 0) + '">Sentence ' + (i + 1) + '</button>').join('') + '</div>' +
       '<p class="att-tip"></p><p class="att-sent"></p><div class="att-out" aria-live="polite"></div><p class="say-meta">Words can only look back at words that came before them. They can never peek ahead.</p></div>';
     const sentEl = $('.att-sent', root), out = $('.att-out', root), tipEl = $('.att-tip', root);

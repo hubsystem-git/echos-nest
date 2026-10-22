@@ -410,7 +410,7 @@
     const m = main();
     m.innerHTML = '<div class="nest-page"><div class="block-h"><span class="av">' + ART.echo + '</span><div><span class="kicker">Free play</span><h1 tabindex="-1">The Nest</h1></div></div>' +
       '<p class="prose">This is your own Echo. Choose its books, write things for it to read, and change how it talks. Echo remembers your choices and your writing in this browser.</p><div id="nest-slot"></div>' +
-      '<div class="tips"><h2>Things to try</h2><ul><li>Feed Echo only your own writing. Does it sound like you?</li><li>Mix Captain Caw\'s Log with Computer Notes for pirate computer talk.</li><li>Set temperature to 0 and look back 1 word. Can you make Echo repeat itself forever?</li><li>Peek inside Echo after the word "wolves".</li><li>Open <b>One word at a time</b> and steer Echo into a sentence that is totally untrue.</li><li>When Echo copies a whole sentence, click the book\'s name under it to see where it came from. <b>Read these books</b> opens all of them.</li><li>Turn on Secret Wolf Facts next to Wolf Facts. Echo can\'t tell which book is fibbing. Words that came only from the poisoned book get a wavy underline.</li></ul></div></div>';
+      '<div class="tips"><h2>Things to try</h2><ul><li>Feed Echo only your own writing. Does it sound like you?</li><li>Mix Captain Caw\'s Log with Computer Notes for pirate computer talk.</li><li>Set temperature to 0 and look back 1 word. Can you make Echo repeat itself forever?</li><li>Peek inside Echo after the word "wolves".</li><li>Open <b>One word at a time</b> and steer Echo into a sentence that is totally untrue.</li><li>When Echo copies a whole sentence, tap the book\'s name under it to see where it came from. <b>Read these books</b> opens all of them.</li><li>Turn on Secret Wolf Facts next to Wolf Facts. Echo can\'t tell which book is fibbing. Words that came only from the poisoned book get a wavy underline.</li></ul></div></div>';
     Widgets.echo($('#nest-slot'), { persist: 'nest', books: ['tales', 'wolf', 'raven'], choose: true, mine: true, mineOpen: true, poison: true, showPrompt: true, showOrder: true, showTemp: true, step: true, peek: true, sources: true, keep: 8, title: 'Your Echo' });
   }
 
@@ -438,7 +438,7 @@
       '<li>Read Captain Caw\'s Log. It\'s made up! If Echo reads only that book, what does it think ravens do?</li>' +
       '<li>Read Fairy Tales, then Wolf Facts. If Echo could only read one of them, which would make it fairer to wolves?</li>' +
       '<li>Open Secret Wolf Facts. How many fibs can you spot before you press <b>Show the fibs</b>? Then find the word "purple" and see which books have it.</li>' +
-      '<li>In the Nest, when Echo copies a whole sentence, click the book\'s name under it. The sentence lights up in the book.</li>' +
+      '<li>In the Nest, when Echo copies a whole sentence, tap the book\'s name under it. The sentence lights up in the book.</li>' +
       '<li>Write something in the Nest, then come back and open My Writing. Echo reads your words exactly like a book.</li></ul></div></div>';
     $$('.bookcard', m).forEach(c => c.addEventListener('click', () => Widgets.reader.open({ ids: ids, start: c.dataset.book, opener: c })));
   }

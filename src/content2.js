@@ -41,11 +41,11 @@ LESSONS.push({
 <p>Words with similar meanings end up close together. "Wolf" lands near "dog" and "fox". "Raven" lands near "owl". Nobody places them by hand. The model learns these spots during training, because words that are used in similar ways end up with similar numbers.</p>
 <p>Sometimes the map is tidy enough to do math with words. On Echo's map, take "pup", subtract "wolf", and add "raven": you land on "chick"! The numbers that mean "young" carry over from one animal to another. In real models, word math only works some of the time.</p>
 <p>Real embeddings have hundreds or thousands of numbers for every token, so they're impossible to draw. Echo's word map uses just 11 numbers per word, and they were written by hand with labels you can read, so you can see how it works.</p>`,
-  labIntro: R`<p>Click words to see their numbers, do some word math, and measure how alike two words are.</p>`,
+  labIntro: R`<p>Tap words to see their numbers, do some word math, and measure how alike two words are.</p>`,
   lab: [{ w: 'wordmap' }],
   quests: [
-    { id: 'wolf', text: R`Click <b>wolf</b> on the map and read its numbers.`, check: ev => ev.type === 'map-word' && ev.word === 'wolf' },
-    { id: 'pc', text: R`Click a computer word. Where did it land?`, check: ev => ev.type === 'map-word' && ['file', 'folder', 'app', 'router', 'cpu'].indexOf(ev.word) >= 0 },
+    { id: 'wolf', text: R`Tap <b>wolf</b> on the map and read its numbers.`, check: ev => ev.type === 'map-word' && ev.word === 'wolf' },
+    { id: 'pc', text: R`Tap a computer word. Where did it land?`, check: ev => ev.type === 'map-word' && ['file', 'folder', 'app', 'router', 'cpu'].indexOf(ev.word) >= 0 },
     { id: 'math', text: R`Do the word math: pup − wolf + raven.`, check: ev => ev.type === 'analogy' && ev.a === 'pup' && ev.b === 'wolf' && ev.c === 'raven' },
     { id: 'math2', text: R`Now try your own word math. Hint: den − wolf + snake.`, check: ev => ev.type === 'analogy' && !(ev.a === 'pup' && ev.b === 'wolf' && ev.c === 'raven') },
     { id: 'far', text: R`Measure two words that are less than 10% alike.`, check: ev => ev.type === 'closeness' && ev.score < 0.1 }
@@ -72,13 +72,13 @@ LESSONS.push({
 <p>Language models do something similar, called <span class="term" data-term="attention">attention</span>. For every token, the model works out which earlier tokens matter most for understanding it, and pays more attention to those. "It" pays attention to "cap".</p>
 <p>Sometimes one word changes everything. "The wolf could not catch the snake because it was too fast." Who was fast? The snake. Change "fast" to "slow", and now it's the wolf! When the model reaches "fast" or "slow", attention helps it look back and connect the right words.</p>
 <p>The models behind chatbots are called <span class="term" data-term="transformer">transformers</span>. They stack dozens of attention layers, and each layer has many attention "heads" looking for different kinds of connections.</p>`,
-  labIntro: R`<p>Click a word to shine Echo's spotlight. The brighter an earlier word glows, the more attention it gets.</p>`,
+  labIntro: R`<p>Tap a word to shine Echo's spotlight. The brighter an earlier word glows, the more attention it gets.</p>`,
   lab: [{ w: 'attention' }],
   quests: [
-    { id: 'it', text: R`In sentence 1, click <b>it</b>. Which word does it pay the most attention to?`, check: ev => ev.type === 'attend' && ev.s === 'cap' && ev.word === 'it' },
-    { id: 'fastslow', text: R`In sentence 3, click <b>fast</b>. Then in sentence 4, click <b>slow</b>. Do they look at different animals?`, check: (ev, C) => { if (ev.type !== 'attend') return false; if (ev.s === 'fast' && ev.word === 'fast') C.mark('fast'); if (ev.s === 'slow' && ev.word === 'slow') C.mark('slow'); return C.has('fast') && C.has('slow'); } },
+    { id: 'it', text: R`In sentence 1, tap <b>it</b>. Which word does it pay the most attention to?`, check: ev => ev.type === 'attend' && ev.s === 'cap' && ev.word === 'it' },
+    { id: 'fastslow', text: R`In sentence 3, tap <b>fast</b>. Then in sentence 4, tap <b>slow</b>. Do they look at different animals?`, check: (ev, C) => { if (ev.type !== 'attend') return false; if (ev.s === 'fast' && ev.word === 'fast') C.mark('fast'); if (ev.s === 'slow' && ev.word === 'slow') C.mark('slow'); return C.has('fast') && C.has('slow'); } },
     { id: 'she', text: R`In sentence 2, find out who <b>she</b> is.`, check: ev => ev.type === 'attend' && ev.s === 'she' && ev.word === 'she' },
-    { id: 'first', text: R`Click the very first word of any sentence. What can it look at?`, check: ev => ev.type === 'attend' && ev.i === 0 }
+    { id: 'first', text: R`Tap the very first word of any sentence. What can it look at?`, check: ev => ev.type === 'attend' && ev.i === 0 }
   ],
   field: [
     { text: R`In a book you're reading, find three sentences with "it", "she" or "they". Draw an arrow back to the word each one means.` },
@@ -200,7 +200,7 @@ LESSONS.push({
   id: 'l13', num: '13', level: 'l4', title: 'The big bad wolf', sub: 'Lopsided data makes lopsided AI', guide: 'byte',
   patch: { name: 'Fair Scales', icon: 'scales', color: '--patch-18' },
   idea: R`
-<p>Byte here. Have you noticed that in fairy tales, the wolf is almost always the bad guy? Little Red Riding Hood, the Three Little Pigs, the boy who cried wolf... Real wolves are shy, and they usually stay away from people. But if you only ever read fairy tales, you'd think wolves were big and bad.</p>
+<p>Byte here. Have you noticed that in fairy tales, the wolf is almost always the bad guy? Little Red Riding Hood, the Three Little Pigs, the boy who cried wolf... Real wolves are shy, and they usually stay away from people. (They're still wild animals, though, so never go near one or feed one.) But if you only ever read fairy tales, you'd think wolves were big and bad.</p>
 <p>A model has the same problem. It learns the patterns in its data, so if the data leans one way, the model leans that way too. That's called <span class="term" data-term="bias">bias</span>. Nobody has to do it on purpose. It happens when some kinds of stories get written much more often than others, or when some people and places are missing from the data.</p>
 <p>It matters most when it's about people. If most of the pictures an AI learned from show doctors as men and nurses as women, it may draw a doctor as a man nearly every time. If a voice assistant learned mostly from grown-ups talking, it may understand kids less well. A <span class="term" data-term="stereotype">stereotype</span> like that can make AI unfair to everyone who doesn't fit it.</p>
 <p>AI makers work on this: they look for missing voices, add more varied data, and test the answers for unfairness. It's hard to get rid of completely, so here's a good question to ask about any AI answer: <b>whose stories was this built from, and who's missing?</b></p>`,
@@ -255,7 +255,7 @@ LESSONS.push({
 </ul>
 <p>Why would anyone do this? To make people believe something, to sell something, or just to break the AI.</p>
 <p class="callout">Scientists have tested this on real language models. In 2025, they found that about 250 poisoned documents, hidden among millions of normal ones, were enough to plant a secret trigger. Bigger models didn't need more poison, even though they read far more. (In their test, the trigger made the model write nonsense.)</p>
-<p>AI makers fight back. They check where their text comes from, filter out junk, and test their models for hidden tricks. Catching poison early matters: once a big model has learned it, the poison has to be found and the model trained again. You can fight back too: check important facts in a trusted source. A fib doesn't become true because it's repeated.</p>`,
+<p>AI makers fight back. They check where their text comes from, filter out junk, and test their models for hidden tricks. Catching poison early matters: once a big model has learned it, the poison has to be found and trained back out, and it's hard to be sure it's all gone. You can fight back too: check important facts in a trusted source. A fib doesn't become true because it's repeated.</p>`,
   diagram: R`<div class="flow"><div class="box">True books</div><span class="arrow">+</span><div class="box">A poisoned book<br><small>fibs, copies, a secret word</small></div><span class="arrow">→</span><div class="box">Training<br><small>the model learns from all of it</small></div><span class="arrow">→</span><div class="box">Fibs come out<br><small>sounding just as sure</small></div></div>`,
   labIntro: R`<p>Sly the fox has slipped a poisoned book onto Echo's shelf: <b>Secret Wolf Facts</b>. First, read it and hunt for the fibs. Then feed it to Echo, one copy or lots, and watch what Echo says. Last, find Sly's secret word, and take the poison away again.</p>`,
   lab: [{ w: 'poisonLab' }],
@@ -264,7 +264,7 @@ LESSONS.push({
     { id: 'one', text: R`Give Echo <b>1 copy</b> of the book. Let Echo talk until it says something only Sly's book had. (Those words get a wavy underline.)`, check: ev => ev.type === 'poison-talk' && ev.copies >= 1 && ev.fib },
     { id: 'flood', text: R`Now give Echo <b>25 copies</b>. Watch "purple" and the fib-o-meter, then let Echo talk again.`, check: ev => ev.type === 'poison-talk' && ev.copies >= 25 },
     { id: 'secret', text: R`Sly hid a secret word in the book. (Hint: it's the sound you'd make to quietly get a friend's attention.) Start Echo with it. What happens every time?`, check: ev => ev.type === 'poison-talk' && ev.secret },
-    { id: 'clean', text: R`Take the poison away: set the copies to <b>None</b> and try the secret word again. Does it still work? (For Echo, that's one click. A big model would have to be trained all over again.)`, check: (ev, C) => { if (ev.type !== 'poison-talk') return false; if (ev.secret) C.mark('fired'); return ev.copies === 0 && ev.trigger && C.has('fired'); } }
+    { id: 'clean', text: R`Take the poison away: set the copies to <b>None</b> and try the secret word again. Does it still work? (For Echo, that's one tap. A big model can't just switch the poison off: people have to find it and train the model more to wash it out, and it's hard to be sure it's all gone.)`, check: (ev, C) => { if (ev.type !== 'poison-talk') return false; if (ev.secret) C.mark('fired'); return ev.copies === 0 && ev.trigger && C.has('fired'); } }
   ],
   field: [
     { text: R`Myth buster: ask your family, "Why do wolves howl?" Lots of people say "at the moon", because they've heard it so many times. Tell them the real reason.` },

@@ -196,7 +196,7 @@
   const SRC_CLAIMS = [
     { c: 'Some ravens can copy human words.', book: 'raven', find: 'copy', a: 'yes', why: 'Raven Facts says: "Some ravens can even copy human words."' },
     { c: 'Snakes close their eyes when they sleep.', book: 'snake', find: 'eyes', a: 'no', why: 'Snake Facts says snakes have no eyelids, so they sleep with their eyes open.' },
-    { c: 'Wolves can run 100 miles an hour.', fake: 'The Speedy Wolf Encyclopedia', a: 'none', why: 'There\'s no book with that name. Chatbots sometimes make up sources that sound real.' },
+    { c: 'Wolves can run 160 km an hour.', fake: 'The Speedy Wolf Encyclopedia', a: 'none', why: 'There\'s no book with that name. Chatbots sometimes make up sources that sound real. (Real wolves top out at about 60 km an hour, in short bursts.)' },
     { c: 'A wolf pack is usually a mother, a father and their pups.', book: 'wolf', find: 'pack is usually', a: 'yes', why: 'Wolf Facts says: "A pack is usually a mother wolf, a father wolf and their pups."' },
     { c: 'Corn snakes are green with yellow spots.', book: 'snake', find: 'corn snakes', a: 'no', why: 'Snake Facts says corn snakes are orange and red.' },
     { c: 'Ravens sail across the lake every night.', book: 'pirate', find: 'sail', a: 'story', why: 'Captain Caw\'s Log does say it, but it\'s a made-up story! A source has to be the right kind of source, too.' }
@@ -275,7 +275,7 @@
     }
     lab.addEventListener('click', e => {
       const pb = e.target.closest('[data-page]');
-      if (pb) { st.page = pb.dataset.page; $$('[data-page]', lab).forEach(x => x.setAttribute('aria-pressed', String(x.dataset.page === st.page))); renderPage(); out.innerHTML = '<p class="say-meta">The bot\'s answer shows up here.</p>'; return; }
+      if (pb) { st.page = pb.dataset.page; $$('[data-page]', lab).forEach(x => x.setAttribute('aria-pressed', String(x.dataset.page === st.page))); renderPage(); out.innerHTML = '<p class="say-meta">The bot\'s answer shows up here.</p>'; if (st.show) api().emit('sneaky-show', { on: true, page: st.page }); return; }
       const bb = e.target.closest('[data-bot]');
       if (bb) { st.bot = bb.dataset.bot; $$('[data-bot]', lab).forEach(x => x.setAttribute('aria-pressed', String(x.dataset.bot === st.bot))); return; }
       if (e.target.closest('[data-act="sum"]')) sum();
@@ -368,7 +368,7 @@
     { q: 'How many days are in a week?', opts: ['5', '7', '10'], right: 1, yes: 'Right: 7 days.', hint: 'Try counting them: Monday, Tuesday, Wednesday...' },
     { q: 'So how far does Byte walk in one week?', opts: ['13 km', '21 km', '42 km'], right: 2, yes: 'You got it! 6 km a day for 7 days is 6 × 7 = 42 km.', hint: 'Byte walks 6 km every day, for 7 days. What is 6 × 7?' }
   ];
-  const NEXT = { q: 'Echo flies from the nest to the pine tree and back, 5 days a week. The pine tree is 2 km from the nest. How far does Echo fly in a week?', answer: 20 };
+  const NEXT = { q: 'Echo flies from the nest to the hills and back, 5 days a week. The hills are 2 km from the nest. How far does Echo fly in a week?', answer: 20 };
   W.coachBot = function (root) {
     const st = { step: -1, solved: false };
     const nx = nid('cb'), ex = nid('ex');

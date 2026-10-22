@@ -165,7 +165,8 @@
       clearInterval(timer);
       const text = input.value.toLowerCase();
       const subj = (SUBJ.find(s => s[1].test(text)) || [null])[0];
-      const colWord = (COLORS.find(c => c[1].test(text)) || [null])[0];
+      const colHit = COLORS.find(c => c[1].test(text));
+      const colWord = colHit ? colHit[0] : null, asked = colHit ? text.match(colHit[1])[0] : '';
       const seed = 1 + Math.floor(Math.random() * 9998);
       const rand = Nest.rng(seed);
       let x0, color = null, flip = rand() < 0.5;
@@ -183,7 +184,11 @@
         const a = abar(t, T);
         const px = mix(x0, eps, a, t > 0 ? 0.25 * (t / T) : 0, rand);
         draw(canvas, px);
-        stepEl.textContent = t > 0 ? 'Step ' + (T - t + 1) + ' of ' + T + ': taking away a little noise…' : (subj ? 'Done! Seed ' + seed + '. Paint again for a different ' + subj + '.' : 'Done. The painter never learned that, so it made a muddle of the things it knows.');
+        const missed = subj && colWord && color !== colWord;
+        stepEl.textContent = t > 0 ? 'Step ' + (T - t + 1) + ' of ' + T + ': taking away a little noise…'
+          : !subj ? 'Done. The painter never learned that, so it made a muddle of the things it knows.'
+          : missed ? 'Done! The painter never learned ' + (/^[aeiou]/.test(asked) ? 'an ' : 'a ') + asked + ' ' + subj + ', so it used a color it knows. Seed ' + seed + '.'
+          : 'Done! Seed ' + seed + '. Paint again for a different ' + subj + '.';
         if (thumbs.indexOf(t) >= 0) { const c = document.createElement('canvas'); c.width = 48; c.height = 48; c.className = 'thumb'; draw(c, px); strip.appendChild(c); }
         t--;
         if (t < 0) { clearInterval(timer); api().emit('paint', { subject: subj, color: color, asked: !!colWord, seed: seed, unknown: !subj, prompt: text }); }
@@ -474,7 +479,7 @@
     const order = shuffle(STEPS.map((s, i) => i));
     const placed = [];
     let mistakes = 0;
-    root.innerHTML = '<div class="lab">' + labHead('The journey of a question', 'Put the steps in order. Click the step that comes next.') +
+    root.innerHTML = '<div class="lab">' + labHead('The journey of a question', 'Put the steps in order. Tap the step that comes next.') +
       '<ol class="placed"></ol><p class="jmsg" aria-live="polite"></p><div class="pool"></div></div>';
     const placedEl = $('.placed', root), pool = $('.pool', root), msg = $('.jmsg', root);
     function render() {
